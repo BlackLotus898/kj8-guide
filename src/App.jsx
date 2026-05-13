@@ -1,11 +1,22 @@
 import { useState, useMemo, useEffect } from "react";
 
-const ROLE_COLOR = { Attacker:"#e85c5c", Defender:"#5c9ee8", Supporter:"#5ce880", Support:"#5ce880" };
-const ROLE_BG   = { Attacker:"#2d1414", Defender:"#14202d", Supporter:"#142d1a", Support:"#142d1a" };
+const TEAL   = "#00d4b8";
+const TEAL2  = "#00aacc";
+const BG     = "#030c0b";
+const BG2    = "#060e0d";
+const BG3    = "#081412";
+const BG4    = "#050f0e";
+const BORDER = "#0d2e2c";
+const BORDER2= "#1a4a46";
+const MUTED  = "#4a8a82";
+const TEXT   = "#c4dedd";
+const TEXT2  = "#8ab8b2";
+
+const ROLE_COLOR = { Attacker:"#e85c5c", Defender:"#5c9ee8", Supporter:"#00d4b8" };
+const ROLE_BG   = { Attacker:"#2d1414", Defender:"#14202d", Supporter:"#062220" };
 const TYPE_COLOR = { Fire:"#e85c30",Ice:"#5cb8e8",Lightning:"#f0c030",Wind:"#5ce870",Shot:"#8aaccc",Slash:"#e8a45c",Blunt:"#b87cd0" };
 
 const CHARACTERS = [
-  // ── AKARI MINASE ─────────────────────────────────────────────────────────
   { id:"am-fc", name:"Akari Minase", variant:"Festive Christmas", parent:"Akari Minase",
     role:"Attacker", type:["Shot","Fire"], ailment:"Burn / Flare-Up",
     weapons:["AR-Xmas 25","AR-Hyperion","AR-Narwhal 59"],
@@ -55,7 +66,6 @@ const CHARACTERS = [
     ascensions:[["A1","—","Vanguard Wings","Revive incapacitated ally with 30% HP (1x/battle). After Overflow Attack, DEF PEN Rate +20% (2 turns) to all allies."],["A2","—","Predatory Bird's-Eye View","Patrol max stack −1. After Combat Skill, DMG dealt +30% (2 turns) to target."],["A3","—","Rekindled Purpose","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","—","Compassionate Overwatch","DMG Dealt +30%, CRIT DMG +60%, Healing Multiplier +30%."],["A5","—","Connected Souls","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","—","Synchro Mastery","CRIT DMG buff before Extra Attack stacks up to 2. After Ultimate, CRIT DMG +50% (3 turns)."]],
     statusNotes:["Overflow, Patrol, Surveillance debuffs apply."] },
 
-  // ── AOI KAGURAGI ─────────────────────────────────────────────────────────
   { id:"ak-fd", name:"Aoi Kaguragi", variant:"Fruits of Diligence", parent:"Aoi Kaguragi",
     role:"Defender", type:["Blunt"], ailment:"—",
     weapons:["HM-Nohpyt","HM-Canasta","—"],
@@ -90,7 +100,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★★","Cautious Movements","After attacking, 50% fixed chance ATK +10% (2 turns)."],["A2","★★★★★","Unflinching Integrity","After Combat Skill, randomly removes 1 of this unit's debuffs."],["A3","★★★","Young Rising Star","Normal Attack, Ultimate Lv. +2 / Max Lv. +2."],["A4","★★★","Unassuming Assurance","After Combat Skill, Effect RES +20% (2 turns)."],["A5","★★★","Mature Spirit","Combat Skill, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★","Exceptional Stamina","After defeating Kaiju with Ultimate, Ultimate Gauge Charge Rate +30% (2 turns)."]],
     statusNotes:["Windbite — Inflicts Wind DoT at start of action."] },
 
-  // ── CHESTER ──────────────────────────────────────────────────────────────
   { id:"chester-ar", name:"Chester", variant:"The All-Rounder", parent:"Chester",
     role:"Supporter", type:["Shot"], ailment:"—",
     weapons:["AR-Anollococ","AR-Hyperion","AR-Lynx 75"],
@@ -108,7 +117,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★★★","Ultimate Wit and Courage","While ally is in Field Ops state, DMG dealt +30%."],["A2","★★★★","Offensive Formation","After Ultimate, DEF PEN Rate +20% (2 turns) to all allies."],["A3","★★★","CLOZER's Paragon","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★","Battle-Forged Veteran","After receiving attack: DEF +20% (2 turns), DMG Taken Reduction +15% (2 turns)."],["A5","★★★","Versatile Operative","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Flawless Execution","Ultimate DMG dealt buff duration +1 turn. Passive Additional DMG Multiplier +50%."]],
     statusNotes:["Field Ops — Shot Additional DMG after attacking (1 turn).","Wit and Courage — All other allies' ATK increased."] },
 
-  // ── EIJI HASEGAWA ────────────────────────────────────────────────────────
   { id:"eiji-rhs", name:"Eiji Hasegawa", variant:"Right-Hand Man of the Strongest", parent:"Eiji Hasegawa",
     role:"Attacker", type:["Blunt","Shot"], ailment:"Stun",
     weapons:["PS-Dobermann 52","—","—"],
@@ -126,7 +134,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★","Rapid Advance","Each PLT destroyed: Ultimate Gauge +15."],["A2","★★★★★","Command Multitasking","After Combat Skill, 50% fixed chance SP +1."],["A3","★★★","Acting Captain Duties","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★★","Frontline Deployment","Progress max stack −1."],["A5","★★★","First Division's Hard Worker","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★","Solid Competence","After Follow-Up Skill, advance next Action Order by 50%."]],
     statusNotes:["Stun — Prevents acting; increases CRIT DMG taken.","Progress — CRIT Rate and CRIT DMG at max stacks."] },
 
-  // ── GEN NARUMI ───────────────────────────────────────────────────────────
   { id:"gn-fs", name:"Gen Narumi", variant:"Future Sight", parent:"Gen Narumi",
     role:"Attacker", type:["Slash","Shot"], ailment:"—",
     weapons:["GS-Oyamatsumi","GS-3305","GS-Takamimusubi"],
@@ -142,7 +149,7 @@ const CHARACTERS = [
     passive:{name:"Created Opportunity",desc:"After an ally attacks a Kaiju in Seen Through state, that attacker's DMG dealt +16.5% (2 turns)."},
     addPassives:[["Lv.40 — Absolute Range Control","Wave start: Ultimate Gauge Charge Rate +100% (2 turns)."],["Lv.60 — Precognitive Eyes","When attacking Kaiju with ≤80% HP, CRIT Rate +20%."],["Lv.80 — Accumulated Results","Each PLT destroyed: ATK +4% (max 5 stacks)."]],
     ascensions:[["A1","★★★★","Overwhelming Pride","After Combat Skill, Ultimate Gauge +30."],["A2","★★★★★","Unbreakable Stratagem","After attacking Kaiju in Seen Through state, Combat Skill DMG Multiplier +25% (max 3 stacks)."],["A3","★★★","User of the Oldest Power","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Preemptive Onslaught","When attacking Core Exposed Kaiju, DEF PEN Rate +24%."],["A5","★★★","Cultivated Power","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★","Tenacious Ace in the Hole","After Ultimate, advance next Action Order by 50%."]],
-    statusNotes:["Seen Through — After 5 ally attacks, removed and 3 PLT destroyed. Core Exposed attacks don't count toward the 5."] },
+    statusNotes:["Seen Through — After 5 ally attacks, removed and 3 PLT destroyed."] },
 
   { id:"gn-jsc", name:"Gen Narumi", variant:"Japan's Strongest Combatant", parent:"Gen Narumi",
     role:"Attacker", type:["Slash","Shot"], ailment:"—",
@@ -178,7 +185,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★★","Successful Promotion","After Combat Skill, CRIT Rate +5% (max 3 stacks)."],["A2","★★★★","In the Spotlight","Before Combat Skill, DEF PEN Rate +15% (2 turns)."],["A3","★★★","Calculated Demeanor","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Smart Neutralization","When HP ≥50%, Ultimate Gauge Charge Rate +16%."],["A5","★★★","Carefree Santa Claus","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Peak Performance","Hyped max stack +4. After Combat Skill or Ultimate, applies 2 stacks of Hyped instead of 1."]],
     statusNotes:["Hyped — ATK and CRIT DMG increased per stack."] },
 
-  // ── HAKUA IGARASHI ───────────────────────────────────────────────────────
   { id:"hi-sp", name:"Hakua Igarashi", variant:"Sincerity and Potential", parent:"Hakua Igarashi",
     role:"Defender", type:["Shot","Fire"], ailment:"—",
     weapons:["AR-Allosaurus 77","AR-Squid 62","—"],
@@ -196,7 +202,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★★","Exceptional Toughness","On turn start, Ultimate Gauge +15."],["A2","★★★★","Unwavering Patience","After Ultimate, DMG Taken Reduction +10% (2 turns) to all allies."],["A3","★★★","Sincere Nature","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★★","Tenacious Spirit","While ally is in Patience state, their Ultimate DMG dealt +15%."],["A5","★★★","Glimmer of Talent","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Culminated Effort","Fire DMG dealt buff from Passive +20%."]],
     statusNotes:["Patience — Recovers HP on turn start."] },
 
-  // ── HARUICHI IZUMO ───────────────────────────────────────────────────────
   { id:"hiz-cc", name:"Haruichi Izumo", variant:"Calculated Choice", parent:"Haruichi Izumo",
     role:"Supporter", type:["Shot"], ailment:"—",
     weapons:["AW-Kokyab","AW-Scopone","Standard Bow"],
@@ -212,7 +217,7 @@ const CHARACTERS = [
     passive:{name:"Universal Support",desc:"After this unit or battle buddy activates Combat Skill, +1 Clarity (max 3). Clarity: CRIT DMG +10%. At max Clarity, consume all and SP +1. After Combat Skill, battle buddy ATK +26.4% (2 turns)."},
     addPassives:[["Lv.40 — State of Immersion","After Combat Skill, battle buddy: ST and Blast Attack DMG dealt +30% (1 turn)."],["Lv.60 — Composed Spirit","Battle start: applies Assistance (3 turns) to self."],["Lv.80 — Unwavering Rapid-Fire","After Normal Attack, advance Action Order by 50% (1x every 2 turns)."]],
     ascensions:[["A1","★★★★","Flawless Arrangements","True Potential also grants target CRIT Rate +20% and DMG dealt +20%."],["A2","★★★★★","Keen Suppression","After Ultimate, CRIT DMG +80% (3 turns) to self."],["A3","★★★","Superior Judgment","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★★","Essence of Archery","Assistance buff targets all allies instead of just battle buddy."],["A5","★★★","The Path Discovered","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Distinguished Choice","Combat Skill buff durations +1 turn."]],
-    statusNotes:["Assistance — Battle buddy's All-Attribute DMG dealt increased.","Clarity — CRIT DMG increased.","True Potential — CRIT DMG increased; cannot be overwritten by weaker effects."] },
+    statusNotes:["Assistance — Battle buddy's All-Attribute DMG dealt increased.","Clarity — CRIT DMG increased.","True Potential — CRIT DMG increased."] },
 
   { id:"hiz-cce", name:"Haruichi Izumo", variant:"The Clean-Cut Elite", parent:"Haruichi Izumo",
     role:"Supporter", type:["Shot"], ailment:"—",
@@ -231,7 +236,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★","Synchronized Breathing","Each Kaiju defeated: Ultimate Gauge +15."],["A2","★★★★","Sharp-Witted Nature","All allies' Effect RES +10%."],["A3","★★★","Neutralization University Valedictorian","Normal Attack, Ultimate Lv. +2 / Max Lv. +2."],["A4","★★★★★","Finishing Blow","After attacking Kaiju with a debuff, Shot Additional DMG equal to 20% ATK."],["A5","★★★","Clean-Cut Powerhouse","Combat Skill, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★","Solid Combat Style","For each debuff on Kaiju, DMG dealt to that Kaiju +5% (max +25%)."]],
     statusNotes:[] },
 
-  // ── HIKARI SHINOMIYA ─────────────────────────────────────────────────────
   { id:"hs-tv", name:"Hikari Shinomiya", variant:"The Valkyrie", parent:"Hikari Shinomiya",
     role:"Attacker", type:["Slash","Wind"], ailment:"—",
     weapons:["Lc-0039","Lc-Rhinoceros 01","Standard Spear"],
@@ -249,7 +253,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★★","Swift Spearwork","DEF PEN Rate +16%."],["A2","★★★★★","Swift as Light","While in Acceleration state, CRIT DMG +24%. Acceleration duration +1 turn."],["A3","★★★","Unmatched Kill Count","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Relentless Chase","Each PLT destroyed: Slash DMG dealt +6% (2 turns), max 3 stacks."],["A5","★★★","For the Family","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★","Preemptive Move","Before Ultimate, applies Forestalled (1 turn) to target. After attacking Forestalled Kaiju, Slash Additional DMG equal to 100% ATK."]],
     statusNotes:["Acceleration — DMG dealt +11%, SPD +300%; Normal/Combat/Follow-Up cannot recover Ultimate Gauge."] },
 
-  // ── IHARU FURUHASHI ──────────────────────────────────────────────────────
   { id:"if-lt", name:"Iharu Furuhashi", variant:"Latent Talent", parent:"Iharu Furuhashi",
     role:"Supporter", type:["Shot","Lightning"], ailment:"Shock",
     weapons:["AR-Hyperion","AR-Cronus","AR-Panther 33"],
@@ -267,7 +270,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★","Direct Effort","Before Combat Skill, 100% chance Effect RES −10% (2 turns) to target."],["A2","★★★★★","Preemptive Intimidation","DEF debuff from Ultimate duration +1 turn."],["A3","★★★","Technical College Powerhouse Valedictorian","Normal Attack, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Relentless Pursuit of Victory","Shock base chance from Combat Skill +35%."],["A5","★★★","Spirit to Soar","Combat Skill, Ultimate Lv. +2 / Max Lv. +2."],["A6","★★★★","Awakening of Talent","Shock DoT DMG Multiplier from Combat Skill +60%."]],
     statusNotes:["Shock — Inflicts Lightning DoT at start of action."] },
 
-  // ── ISAO SHINOMIYA ───────────────────────────────────────────────────────
   { id:"is-pf", name:"Isao Shinomiya", variant:"Prime Fist", parent:"Isao Shinomiya",
     role:"Attacker", type:["Blunt"], ailment:"—",
     weapons:["Fs-Baldr","Fs-Magni","Fs-1002"],
@@ -302,7 +304,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★★★","Preparation for a Prolonged Battle","After attacking, recover HP equal to 5% Max HP."],["A2","★★★★★","Last Line of Defense","If incapacitated, recover 25% Max HP and resurrect (1x/battle)."],["A3","★★★","Resolve to Protect the Nation","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★","Perfectionism","Battle start: Shield (3 turns) to all allies."],["A5","★★★","Role to Fulfill","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★","Unified Offense and Defense","While having Shield, Normal Attack and Ultimate DMG Multiplier +80%."]],
     statusNotes:[] },
 
-  // ── JURA IGARASHI ────────────────────────────────────────────────────────
   { id:"ji-gd", name:"Jura Igarashi", variant:"Grit and Duty", parent:"Jura Igarashi",
     role:"Supporter", type:["Blunt","Fire"], ailment:"Burn",
     weapons:["SB-7137","SB-Stegosaurus 38","—"],
@@ -318,9 +319,8 @@ const CHARACTERS = [
     passive:{name:"Commanding Grit",desc:"After Normal Attack, all allies Effect Hit Rate +12.1% (2 turns). After Ultimate, applies Afterburn (3 turns) to target: when target takes DoT, triggers 1 additional instance equal to 22% of total DoT."},
     addPassives:[["Lv.40 — Renowned Capability","On turn start, Ultimate Gauge +15."],["Lv.60 — Unflagging Spirit","When ally attacks Kaiju in Afterburn state, DEF PEN Rate +18%."],["Lv.80 — Boundless Brawn","When Effect Hit Rate ≥70%, all allies' DoT DMG Multiplier +20%."]],
     ascensions:[["A1","★★★★★","Infectious Zeal","Afterburn Effect Multiplier +40%."],["A2","★★★★★","Seething Hot Blood","Wave start: applies Afterburn (3 turns) to all Kaiju."],["A3","★★★","Iron-Clad Trust","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★","All at Once","Burn from Ultimate applies to all Kaiju. Wave start: 65% chance to apply Burn to all Kaiju."],["A5","★★★","Strongest Big Sis","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Grit-Fueled Push","Afterburn applies to all Kaiju. When ally attacks Kaiju with debuff/ailment, ally ATK +30%."]],
-    statusNotes:["Burn — Fire DoT at start of action.","Afterburn — Extra DoT instance (22% of total DoT) when target takes DoT.","Hot-Blooded — DMG dealt, ATK, and SPD increased."] },
+    statusNotes:["Burn — Fire DoT at start of action.","Afterburn — Extra DoT instance when target takes DoT.","Hot-Blooded — DMG dealt, ATK, and SPD increased."] },
 
-  // ── KAFKA HIBINO ─────────────────────────────────────────────────────────
   { id:"kh-mk", name:"Kafka Hibino", variant:"The Man Who Became a Kaiju", parent:"Kafka Hibino",
     role:"Attacker", type:["Shot"], ailment:"—",
     weapons:["HG-Beetle 15","—","—"],
@@ -329,7 +329,7 @@ const CHARACTERS = [
     skillPrio:[["Passive Skill",5],["Combat Skill",4],["Ultimate",3],["Normal Attack",2],["Follow-Up Skill",1]],
     skills:[
       {name:"Normal Attack",title:"1% Shot / Inhuman Fist",desc:"Pre-transform: Shot DMG 55% ATK. Post-transform (Kaiju form): Blunt DMG 55% ATK.",ugc:66,sp:"—",type:"Shot / Blunt",range:"Single Target"},
-      {name:"Combat Skill",title:"Wholehearted Support / Overwhelming Roar",desc:"Pre-transform: Shot DMG 89% ATK, DEF −16% (1 turn) to target, SPD +16% (1 turn) to self. Post-transform: Blunt DMG 64% ATK to all Kaiju.",ugc:99,sp:1,type:"Shot / Blunt",range:"ST / AoE"},
+      {name:"Combat Skill",title:"Wholehearted Support / Overwhelming Roar",desc:"Pre-transform: Shot DMG 89% ATK, DEF −16% (1 turn) to target. Post-transform: Blunt DMG 64% ATK to all Kaiju.",ugc:99,sp:1,type:"Shot / Blunt",range:"ST / AoE"},
       {name:"Ultimate",title:"Transformation / Acquired Fighting Style",desc:"Transform: enter Kaiju form (HP +44%, SPD +10, full heal, advance Action Order 100%). Post-transform Ultimate becomes single-target Blunt attack.",ugc:"300★",sp:"—",type:"— / Blunt",range:"Enhance / ST"},
       {name:"Follow-Up Skill",title:"Experienced Support / Earth-Shaking Blow",desc:"Pre-transform: Shot DMG 55% ATK. Post-transform: Blunt DMG 66% ATK.",ugc:60,sp:"—",type:"Shot / Blunt",range:"Single Target"},
     ],
@@ -353,9 +353,8 @@ const CHARACTERS = [
     passive:{name:"Agile Footwork",desc:"After ally in Gift or Care Package state activates Ultimate, DMG dealt +16% (2 turns) to that activator."},
     addPassives:[["Lv.40 — Steady Growth","Normal Attack and Follow-Up Skill DMG dealt +30%."],["Lv.60 — Timely Encouragement","Battle start: advance Action Order by 25%."],["Lv.80 — Christmas Eve Mainstay","After Ultimate, Ultimate Gauge Charge Rate +15% (2 turns)."]],
     ascensions:[["A1","★★★★","Generous Spirit","After Ultimate, randomly removes 1 of this unit's debuffs."],["A2","★★★★★","Big Fat Gift","Gift from Ultimate duration +1 turn."],["A3","★★★","Approachable Air","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Life of the Party","On turn start, Ultimate Gauge +10."],["A5","★★★","Reliable Reindeer","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Heartfelt Support","After Ultimate, target's Ultimate Gauge +25."]],
-    statusNotes:["Care Package — After consuming 2 SP, recover 2 SP (auto-removed if applied to another ally).","Gift — ATK increased; cannot be overwritten by weaker effects."] },
+    statusNotes:["Care Package — After consuming 2 SP, recover 2 SP.","Gift — ATK increased."] },
 
-  // ── KAIJU NO. 8 ──────────────────────────────────────────────────────────
   { id:"k8-f98", name:"Kaiju No. 8", variant:"Fortitude 9.8", parent:"Kaiju No. 8",
     role:"Attacker", type:["Blunt"], ailment:"—",
     weapons:["Cannot equip","—","—"],
@@ -385,12 +384,11 @@ const CHARACTERS = [
       {name:"Ultimate",title:"Full-On Heatblast",desc:"Deals Blunt and Fire DMG equal to 267% ATK to single Kaiju; 129% to adjacent. After attacking, SPD +14.6% (1 turn).",ugc:"300★",sp:"—",type:"Blunt / Fire",range:"Blast"},
       {name:"Follow-Up Skill",title:"Scorching Fist",desc:"Deals Blunt and Fire DMG equal to 77% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Blunt / Fire",range:"Single Target"},
     ],
-    passive:{name:"Resonant Resolve",desc:"Cannot equip weapons/uniparts. Before Ultimate: DMG dealt +1.2%, Ultimate DMG dealt +5.5% (max 5 stacks). After any ally activates Ultimate — self: consume up to 3 Resolve for Ultimate Gauge +30 each, then +2 Resolve; other ally: +1 Resolve. Resolve: Blunt DMG dealt +4.4%, Ultimate DMG Multiplier +8.8% (max 6 stacks)."},
+    passive:{name:"Resonant Resolve",desc:"Cannot equip weapons/uniparts. Before Ultimate: DMG dealt +1.2%, Ultimate DMG dealt +5.5% (max 5 stacks). After any ally activates Ultimate — self: consume up to 3 Resolve for Ultimate Gauge +30 each, then +2 Resolve; other ally: +1 Resolve."},
     addPassives:[["Lv.40 — Overflowing Power","ATK +32%, SPD +20, CRIT Rate +24%."],["Lv.60 — Lingering Heat","ATK +46%. After Ultimate, CRIT DMG +36% (2 turns)."],["Lv.80 — Beyond Resolve","CRIT DMG +48%. For every 100 ATK over 1,200, CRIT Rate +3% (max +27%)."]],
-    ascensions:[["A1","★★★★","Unwavering Readiness","Ultimate CRIT DMG +42%."],["A2","★★★★★","Deep-Piercing Heat","After Ultimate with 3 Resolve consumed, DEF PEN Rate +18% (2 turns). Combat Skill DMG Multiplier +30%."],["A3","★★★","Unidentified Form","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★★","Deepening Resolve","After Combat Skill or Follow-Up Skill, +1 Resolve."],["A5","★★★","Embers of Rage","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Thermal Overdrive","Resolve max stack +2. Resolve also grants Ultimate DMG Multiplier +4%."]],
+    ascensions:[["A1","★★★★","Unwavering Readiness","Ultimate CRIT DMG +42%."],["A2","★★★★★","Deep-Piercing Heat","After Ultimate with 3 Resolve consumed, DEF PEN Rate +18% (2 turns)."],["A3","★★★","Unidentified Form","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★★","Deepening Resolve","After Combat Skill or Follow-Up Skill, +1 Resolve."],["A5","★★★","Embers of Rage","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Thermal Overdrive","Resolve max stack +2. Resolve also grants Ultimate DMG Multiplier +4%."]],
     statusNotes:["Resolve — Blunt DMG dealt and Ultimate DMG Multiplier increased."] },
 
-  // ── KEIJI ITAMI ──────────────────────────────────────────────────────────
   { id:"ki-cq", name:"Keiji Itami", variant:"Calm and Quiet", parent:"Keiji Itami",
     role:"Supporter", type:["Shot"], ailment:"Poison / Stun",
     weapons:["AR-Hyperion","AR-Cronus","AR-Narwhal 59"],
@@ -399,16 +397,15 @@ const CHARACTERS = [
     skillPrio:[["Combat Skill",5],["Ultimate",3],["Passive Skill",3],["Normal Attack",1],["Follow-Up Skill",1]],
     skills:[
       {name:"Normal Attack",title:"Dignified Shot",desc:"Deals Shot DMG equal to 55% ATK to a single Kaiju.",ugc:54,sp:"—",type:"Shot",range:"Single Target"},
-      {name:"Combat Skill",title:"Smoke Grenade",desc:"Deals Shot DMG equal to 54% ATK to single Kaiju. 80% chance to apply Poison (2 turns): DoT equal to 5% target's Max HP (max 128% applier's ATK).",ugc:81,sp:1,type:"Shot",range:"Single Target"},
+      {name:"Combat Skill",title:"Smoke Grenade",desc:"Deals Shot DMG equal to 54% ATK to single Kaiju. 80% chance to apply Poison (2 turns): DoT equal to 5% target's Max HP.",ugc:81,sp:1,type:"Shot",range:"Single Target"},
       {name:"Ultimate",title:"Loud Grenade",desc:"Deals Shot DMG equal to 224% ATK to single Kaiju. 80% chance to apply Stun (1 turn).",ugc:"300★",sp:"—",type:"Shot",range:"Single Target"},
       {name:"Follow-Up Skill",title:"Rational Support",desc:"Deals Shot DMG equal to 55% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Shot",range:"Single Target"},
     ],
     passive:{name:"Discreet Operation",desc:"If no attack received for 1 turn, after attacking: Stealth (1 turn). While in Stealth, after attacking: Shot Additional DMG equal to 50% ATK."},
     addPassives:[["Lv.40 — Handling with Ease","When HP ≥80%, ATK +15%."],["Lv.60 — Precision from Experience","Effect Hit Rate +16%."],["Lv.80 — Prudent Demeanor","When attacking Kaiju in Poison state, DMG dealt +20%."]],
     ascensions:[["A1","★★★★","Habitual Procedure","While in Stealth state, SP will not be consumed."],["A2","★★★","Smooth Progress","After defeating Kaiju, Ultimate Gauge +35."],["A3","★★★","Sharp Insight","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★★","Setting Up the Next Move","After Ultimate, randomly remove 1 of target's buffs."],["A5","★★★","Linchpin of the Defense Force","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★","Seasoned Expertise","Before Combat Skill, 100% chance DMG Taken Increase +10% (2 turns) to target."]],
-    statusNotes:["Poison — DoT based on target's Max HP at start of action.","Stun — Prevents acting; increases CRIT DMG taken.","Stealth — Will not be targeted by Kaiju."] },
+    statusNotes:["Poison — DoT based on target's Max HP.","Stun — Prevents acting.","Stealth — Will not be targeted."] },
 
-  // ── KIKORU SHINOMIYA ─────────────────────────────────────────────────────
   { id:"ks-et", name:"Kikoru Shinomiya", variant:"Evolving Talent", parent:"Kikoru Shinomiya",
     role:"Attacker", type:["Slash","Blunt"], ailment:"—",
     weapons:["S-12066","S-Silky Shark 13","Standard Greatsword"],
@@ -421,10 +418,10 @@ const CHARACTERS = [
       {name:"Ultimate",title:"All-Out Cleave",desc:"Deals Slash and Blunt DMG equal to 92% ATK to all Kaiju. After attacking, applies Bold (3 turns): after Combat Skill or Extra Attack, Slash Additional DMG equal to 34.7% ATK.",ugc:"300★",sp:"—",type:"Slash / Blunt",range:"AoE"},
       {name:"Follow-Up Skill",title:"Rapid Strike",desc:"Deals Slash and Blunt DMG equal to 77% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Slash / Blunt",range:"Single Target"},
     ],
-    passive:{name:"Vengeful Resolve",desc:"After Combat Skill, Ultimate, or each time ally receives attack: +1 Wrath (max 6). When Wrath ≥3, after attacking: consume 3 Wrath → Extra Attack (Slash / Blunt DMG 22% ATK to target + adjacent, Additional DMG Multiplier +27.5%)."},
+    passive:{name:"Vengeful Resolve",desc:"After Combat Skill, Ultimate, or each time ally receives attack: +1 Wrath (max 6). When Wrath ≥3, after attacking: consume 3 Wrath → Extra Attack."},
     addPassives:[["Lv.40 — Overflowing Combat Will","Battle start: Bold (3 turns)."],["Lv.60 — Fueled by Resolve","After defeating Kaiju, Ultimate Gauge +30."],["Lv.80 — Swift Adjustment","For every 100 ATK over 1,200, CRIT Rate +4% (max +36%)."]],
-    ascensions:[["A1","★★★★","Mastered Onslaught","After Normal Attack or Combat Skill, Slash Additional DMG equal to 30% ATK."],["A2","★★★★★","Belligerent Stance","While in Bold state, CRIT DMG +35%."],["A3","★★★","Substantial Growth","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★","Impenetrable Stance","After Extra Attack: DEF +20% (2 turns), Effect RES +20% (2 turns)."],["A5","★★★","Continuous Progress","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Seized Mastery","After defeating Kaiju, +1 Wrath. Additional DMG dealt +30%, CRIT DMG from Additional DMG +50%."]],
-    statusNotes:["Bold — After Combat Skill or Extra Attack, deals Slash Additional DMG.","Wrath — At ≥3 stacks, activates Extra Attack after attacking."] },
+    ascensions:[["A1","★★★★","Mastered Onslaught","After Normal Attack or Combat Skill, Slash Additional DMG equal to 30% ATK."],["A2","★★★★★","Belligerent Stance","While in Bold state, CRIT DMG +35%."],["A3","★★★","Substantial Growth","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★","Impenetrable Stance","After Extra Attack: DEF +20% (2 turns), Effect RES +20% (2 turns)."],["A5","★★★","Continuous Progress","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Seized Mastery","After defeating Kaiju, +1 Wrath. Additional DMG dealt +30%."]],
+    statusNotes:["Bold — After Combat Skill or Extra Attack, deals Slash Additional DMG.","Wrath — At ≥3 stacks, activates Extra Attack."] },
 
   { id:"ks-fpc", name:"Kikoru Shinomiya", variant:"Full-Power Christmas", parent:"Kikoru Shinomiya",
     role:"Defender", type:["Slash"], ailment:"—",
@@ -435,12 +432,12 @@ const CHARACTERS = [
     skills:[
       {name:"Normal Attack",title:"Tree Cleaver",desc:"Deals Slash DMG equal to 55% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Slash",range:"Single Target"},
       {name:"Combat Skill",title:"Present Delivery",desc:"Recovers single ally's HP equal to 12.8% Max HP +54. Randomly removes 1 of target's debuffs.",ugc:90,sp:1,type:"—",range:"Recovery"},
-      {name:"Ultimate",title:"Christmas Eve Extravaganza",desc:"Recovers all allies' HP equal to 7.3% Max HP +42. Applies Engrossed (1 turn) to all other allies: before Normal Attack / Combat Skill, recover 16.8% Max HP; after, if HP ≥50%, ATK +16.8% (3 turns).",ugc:"300★",sp:"—",type:"—",range:"Recovery"},
+      {name:"Ultimate",title:"Christmas Eve Extravaganza",desc:"Recovers all allies' HP equal to 7.3% Max HP +42. Applies Engrossed (1 turn) to all other allies.",ugc:"300★",sp:"—",type:"—",range:"Recovery"},
       {name:"Follow-Up Skill",title:"Tree Splitter",desc:"Deals Slash DMG equal to 77% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Slash",range:"Single Target"},
     ],
     passive:{name:"Christmas Spirit",desc:"After Normal Attack or Follow-Up Skill, DMG dealt +9.9% (1 turn) to all allies. After Combat Skill, Ultimate Gauge Charge Rate +7.8% (2 turns) to all other allies."},
     addPassives:[["Lv.40 — Maximum Effort","On turn start, Ultimate Gauge +12."],["Lv.60 — Indomitable Santa","Effect RES +30%."],["Lv.80 — Holy Night Miracle","If ally becomes incapacitated, recover 30% Max HP and revive (1x/battle)."]],
-    ascensions:[["A1","★★★★","Selfless Focus","Battle start: Engrossed (1 turn) to all other allies."],["A2","★★★","Insight in Crisis","When HP ≤30%, after Combat Skill: recover HP equal to 10% Max HP +300."],["A3","★★★","All-Out Christmas","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Perfect Present","After Combat Skill: DMG Taken Reduction +10% (2 turns) and DMG dealt +10% (2 turns) to target."],["A5","★★★","Memories Recalled","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","True Essence of Christmas Eve","After Combat Skill or Ultimate, DMG dealt +40% (2 turns) to target."]],
+    ascensions:[["A1","★★★★","Selfless Focus","Battle start: Engrossed (1 turn) to all other allies."],["A2","★★★","Insight in Crisis","When HP ≤30%, after Combat Skill: recover HP equal to 10% Max HP +300."],["A3","★★★","All-Out Christmas","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Perfect Present","After Combat Skill: DMG Taken Reduction +10% and DMG dealt +10% (2 turns) to target."],["A5","★★★","Memories Recalled","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","True Essence of Christmas Eve","After Combat Skill or Ultimate, DMG dealt +40% (2 turns) to target."]],
     statusNotes:["Engrossed — Recovers HP before Normal Attack / Combat Skill; ATK increased if HP ≥50%."] },
 
   { id:"ks-glf", name:"Kikoru Shinomiya", variant:"Guiding Light of the Future", parent:"Kikoru Shinomiya",
@@ -458,7 +455,7 @@ const CHARACTERS = [
     passive:{name:"Rising Morale",desc:"After any skill except Ultimate: +1 Tip-Top Shape (max 3). After Ultimate: consume all Tip-Top Shape. Tip-Top Shape: ATK +5.5%, CRIT DMG +11%."},
     addPassives:[["Lv.40 — Young Talent","Battle start: Ultimate Gauge +60."],["Lv.60 — No Limit","If Tip-Top Shape ≥1, Effect Hit Rate +30%."],["Lv.80 — Finishing Touch","When attacking Kaiju with ≤50% HP, Combat Skill DMG dealt +20%."]],
     ascensions:[["A1","★★★★","Decisive Ax Strike","When attacking Kaiju with a debuff, CRIT Rate +15%."],["A2","★★★★","Lasting Slash","DEF debuff from Ultimate duration +1 turn."],["A3","★★★","Outstanding Ability","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★","Aggressive Combat Style","Ultimate Gauge Charge Rate +10%."],["A5","★★★","Light of Hope","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","On the Rise","After Ultimate, Tip-Top Shape is not consumed."]],
-    statusNotes:["Tip-Top Shape — ATK and CRIT DMG increased per stack; consumed after Ultimate."] },
+    statusNotes:["Tip-Top Shape — ATK and CRIT DMG increased per stack."] },
 
   { id:"ks-iw", name:"Kikoru Shinomiya", variant:"The Inherited Will", parent:"Kikoru Shinomiya",
     role:"Attacker", type:["Blunt"], ailment:"—",
@@ -472,9 +469,9 @@ const CHARACTERS = [
       {name:"Ultimate",title:"Full-Force Strike",desc:"Deals Blunt PEN DMG equal to 115% ATK to single Kaiju; 58% to adjacent. 65% chance to apply DEF −10.5% (2 turns).",ugc:"300★",sp:"—",type:"Blunt",range:"Blast"},
       {name:"Follow-Up Skill",title:"Twin Blast",desc:"Deals Blunt PEN DMG equal to 48% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Blunt",range:"Single Target"},
     ],
-    passive:{name:"Inherited Resolve",desc:"After Ultimate, applies Inheritance (3 turns): Ultimate Gauge Charge Rate +100%; 65% chance after Normal Attack: DEF −11% to target; 65% chance after Combat Skill: DEF −7.8% to target."},
+    passive:{name:"Inherited Resolve",desc:"After Ultimate, applies Inheritance (3 turns): Ultimate Gauge Charge Rate +100%; DEF debuffs applied after Normal Attack / Combat Skill."},
     addPassives:[["Lv.40 — Unleashed Power","DMG dealt increased by 100% of Effect Hit Rate (max +80%)."],["Lv.60 — Fully Prepared","Battle start: Ultimate Gauge +300."],["Lv.80 — Strengthened Resolve","After Ultimate, ATK +20% (2 turns)."]],
-    ascensions:[["A1","★★★★","Natural Talent","After attacking Kaiju with a debuff, Blunt DMG dealt +20% (1 turn)."],["A2","★★★★","Quintessential Inheritance","While in Inheritance state, Normal Attack DMG Multiplier +30%, Combat Skill DMG Multiplier +30%."],["A3","★★★","Lofty Ideals","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★","Inherited Spirit","Wave start: 150% chance Effect RES −20% to all Kaiju."],["A5","★★★","Pursuit of Ideals","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Strength to Uphold a Legacy","After Ultimate, Ultimate DMG Multiplier +130% (3 turns). While in Inheritance, after Normal Attack, advance Action Order by 20%."]],
+    ascensions:[["A1","★★★★","Natural Talent","After attacking Kaiju with a debuff, Blunt DMG dealt +20% (1 turn)."],["A2","★★★★","Quintessential Inheritance","While in Inheritance state, Normal Attack and Combat Skill DMG Multiplier +30%."],["A3","★★★","Lofty Ideals","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★","Inherited Spirit","Wave start: 150% chance Effect RES −20% to all Kaiju."],["A5","★★★","Pursuit of Ideals","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Strength to Uphold a Legacy","After Ultimate, Ultimate DMG Multiplier +130% (3 turns)."]],
     statusNotes:["Inheritance — Ultimate Gauge Charge Rate +100%; DEF debuffs applied after Normal Attack / Combat Skill."] },
 
   { id:"ks-mp", name:"Kikoru Shinomiya", variant:"The Mission to Be Perfect", parent:"Kikoru Shinomiya",
@@ -491,10 +488,9 @@ const CHARACTERS = [
     ],
     passive:{name:"Dominating Combat Style",desc:"After an ally causes a Kaiju to become Core Exposed, SPD +13.7% (2 turns) to this unit."},
     addPassives:[["Lv.40 — Constant Growth","When HP ≤50%, chance of being targeted slightly decreases."],["Lv.60 — Perfection on Display","Battle start: advance Action Order by 25%."],["Lv.80 — Next Objective","After defeating Kaiju, ATK +20% (2 turns)."]],
-    ascensions:[["A1","★★★","Outstanding Talent","After Combat Skill vs Core Exposed Kaiju, Ultimate Gauge +30."],["A2","★★★★","Tireless Effort","When attacking Core Exposed Kaiju, DMG dealt +20%."],["A3","★★★","Discipline","Normal Attack, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A4","★★★★★","Pursuit of Perfection","Each PLT destroyed: ATK +6% (max 5 stacks)."],["A5","★★★","Vow of the Past","Combat Skill, Ultimate, Passive Lv. +2 / Max Lv. +2."],["A6","★★★★","Accumulating Experience","Ultimate DMG dealt +20% and Slash Additional DMG Multiplier +50%."]],
+    ascensions:[["A1","★★★","Outstanding Talent","After Combat Skill vs Core Exposed Kaiju, Ultimate Gauge +30."],["A2","★★★★","Tireless Effort","When attacking Core Exposed Kaiju, DMG dealt +20%."],["A3","★★★","Discipline","Normal Attack, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A4","★★★★★","Pursuit of Perfection","Each PLT destroyed: ATK +6% (max 5 stacks)."],["A5","★★★","Vow of the Past","Combat Skill, Ultimate, Passive Lv. +2 / Max Lv. +2."],["A6","★★★★","Accumulating Experience","Ultimate DMG dealt +20%."]],
     statusNotes:[] },
 
-  // ── KOTA TACHIBANA ───────────────────────────────────────────────────────
   { id:"kt-fff", name:"Kota Tachibana", variant:"First Division's Feral Force", parent:"Kota Tachibana",
     role:"Defender", type:["Shot","Ice"], ailment:"Freeze",
     weapons:["AR-Squid 62","—","—"],
@@ -504,7 +500,7 @@ const CHARACTERS = [
     skills:[
       {name:"Normal Attack",title:"Steady Shot",desc:"Deals Shot DMG equal to 55% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Shot",range:"Single Target"},
       {name:"Combat Skill",title:"Menacing Blow",desc:"Deals Shot DMG equal to 118% ATK to single Kaiju. 100% chance to apply ATK −9.6% (3 turns) to target.",ugc:90,sp:1,type:"Shot",range:"Single Target"},
-      {name:"Ultimate",title:"Freeze Grenade",desc:"Deals Shot and Ice DMG equal to 153% ATK to single Kaiju. 80% chance to apply Freeze (1 turn): delays Action Order by 30%, Ice Additional DMG equal to 38.5% ATK on turn start.",ugc:"300★",sp:"—",type:"Shot / Ice",range:"Single Target"},
+      {name:"Ultimate",title:"Freeze Grenade",desc:"Deals Shot and Ice DMG equal to 153% ATK to single Kaiju. 80% chance to apply Freeze (1 turn).",ugc:"300★",sp:"—",type:"Shot / Ice",range:"Single Target"},
       {name:"Follow-Up Skill",title:"Solid Shot",desc:"Deals Shot DMG equal to 55% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Shot",range:"Single Target"},
     ],
     passive:{name:"Absolute Conviction",desc:"When HP ≥50%, chance of being targeted increases. After Normal Attack vs Kaiju with debuff / ailment, apply Shield (1 turn) equal to 9.5% DEF +36 to self."},
@@ -512,7 +508,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★★★","Feral Gaze","After Ultimate, recover HP equal to 5% Max HP."],["A2","★★★★","Mark of the Platoon Leader","Shield from Passive duration +1 turn."],["A3","★★★","First Division's Pride","Normal Attack, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A4","★★★","Top-Tier Ability","Shield Application Multiplier +25%."],["A5","★★★","Respect for the Strongest","Combat Skill, Ultimate Lv. +2 / Max Lv. +2."],["A6","★★★★","Unmatched Caliber","After receiving attack, DMG Taken Reduction +5% (max 5 stacks)."]],
     statusNotes:["Freeze — Ice DoT at start of action; delays Action Order by 30%."] },
 
-  // ── MINA ASHIRO ──────────────────────────────────────────────────────────
   { id:"ma-agh", name:"Mina Ashiro", variant:"Aiming for Greater Heights", parent:"Mina Ashiro",
     role:"Supporter", type:["Shot"], ailment:"—",
     weapons:["AR-Hyperion","AR-Panther 33","—"],
@@ -559,12 +554,11 @@ const CHARACTERS = [
       {name:"Ultimate",title:"Tigerback Barrage",desc:"Deals Shot DMG equal to 168% ATK to single Kaiju; 84% to adjacent. After attacking, applies Combined Forces (3 turns): after Bakko acts, activates Extra Attack.",ugc:"300★",sp:"—",type:"Shot",range:"Blast"},
       {name:"Follow-Up Skill",title:"High-Mobility Snipe",desc:"Deals Shot DMG equal to 77% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Shot",range:"Single Target"},
     ],
-    passive:{name:"Seamless Synergy",desc:"Battle start: summons Bakko (fixed SPD 105). After Bakko's turn: CRIT Rate +16.5% (1 turn) and Shield (3 turns) equal to 5.5% Max HP to self. Extra Attack: Shot DMG 50% ATK to single Kaiju and adjacent."},
+    passive:{name:"Seamless Synergy",desc:"Battle start: summons Bakko (fixed SPD 105). After Bakko's turn: CRIT Rate +16.5% (1 turn) and Shield (3 turns) equal to 5.5% Max HP to self."},
     addPassives:[["Lv.40 — True Strength Unleashed","Before Extra Attack, DMG dealt +20% (2 turns)."],["Lv.60 — Moral Support","Battle start: Combined Forces (3 turns)."],["Lv.80 — Absolute Trust","After Ultimate, ATK +20% (2 turns)."]],
-    ascensions:[["A1","★★★★","Exceptional Artillery Power","Before Combat Skill or Ultimate, CRIT DMG +30% (1 turn)."],["A2","★★★★★","Combined Forces Maintained","Combined Forces duration +1 turn. After Extra Attack, DEF PEN Rate +4% (max 5 stacks)."],["A3","★★★","Loyalty Beyond Species","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★","Firm Conviction","Shield Application Multiplier +50%."],["A5","★★★","Back-to-Back Trust","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Perfected Snipe","Bakko CRIT Rate buff duration +1 turn. When HP ≥70%, CRIT DMG +50%."]],
+    ascensions:[["A1","★★★★","Exceptional Artillery Power","Before Combat Skill or Ultimate, CRIT DMG +30% (1 turn)."],["A2","★★★★★","Combined Forces Maintained","Combined Forces duration +1 turn."],["A3","★★★","Loyalty Beyond Species","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★","Firm Conviction","Shield Application Multiplier +50%."],["A5","★★★","Back-to-Back Trust","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Perfected Snipe","When HP ≥70%, CRIT DMG +50%."]],
     statusNotes:["Combined Forces — After Bakko acts, activates Extra Attack."] },
 
-  // ── RENO ICHIKAWA ────────────────────────────────────────────────────────
   { id:"ri-cu", name:"Reno Ichikawa", variant:"The Compatible User", parent:"Reno Ichikawa",
     role:"Attacker", type:["Shot","Ice"], ailment:"Freeze",
     weapons:["AR-Boreas","AR-Hyperion","AR-Octopus 58"],
@@ -579,8 +573,8 @@ const CHARACTERS = [
     ],
     passive:{name:"Composed Thinking",desc:"After Combat Skill, Follow-Up, or Ultimate vs Kaiju in Ice Crystal state, applies Ice Crystal (2 turns) to adjacent Kaiju. Ice Crystal: after ally attacks, deals Ice Additional DMG equal to 21% of applier's ATK."},
     addPassives:[["Lv.40 — Instant Cold Energy","After Combat Skill, 50% fixed chance SP +1."],["Lv.60 — Limitless Aspiration","Wave start: applies Ice Crystal (2 turns) to all Kaiju."],["Lv.80 — Results of Basic Training","When attacking Kaiju in Ice Crystal state, DMG dealt +18%."]],
-    ascensions:[["A1","★★★★","Lingering Cold","Before Ultimate, CRIT DMG +30% (1 turn)."],["A2","★★★★","Bone-Chilling Frostbite","When attacking Kaiju in Ice Crystal state, DEF PEN Rate +16%."],["A3","★★★","Young Talent","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Restoration of Cold Energy","Each time Ice Additional DMG from Ice Crystal activates, Ultimate Gauge +2."],["A5","★★★","Compatible with the Strongest Weapon","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Awakened Compatible User","Ice Additional DMG Multiplier from Ice Crystal +60%."]],
-    statusNotes:["Freeze — Ice DoT at start of action; delays Action Order by 30%.","Ice Crystal — After ally attacks, Ice Additional DMG equal to applier's ATK %."] },
+    ascensions:[["A1","★★★★","Lingering Cold","Before Ultimate, CRIT DMG +30% (1 turn)."],["A2","★★★★","Bone-Chilling Frostbite","When attacking Kaiju in Ice Crystal state, DEF PEN Rate +16%."],["A3","★★★","Young Talent","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Restoration of Cold Energy","Each time Ice Additional DMG activates, Ultimate Gauge +2."],["A5","★★★","Compatible with the Strongest Weapon","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Awakened Compatible User","Ice Additional DMG Multiplier from Ice Crystal +60%."]],
+    statusNotes:["Freeze — Ice DoT; delays Action Order by 30%.","Ice Crystal — After ally attacks, Ice Additional DMG."] },
 
   { id:"ri-soa", name:"Reno Ichikawa", variant:"Signs of Awakening", parent:"Reno Ichikawa",
     role:"Attacker", type:["Shot"], ailment:"—",
@@ -599,7 +593,6 @@ const CHARACTERS = [
     ascensions:[["A1","—","Calm Demeanor","When HP ≤50%, DEF +20%."],["A2","—","Passion Within","Passive Shot Additional DMG Multiplier +20%."],["A3","—","Rapidly Growing Talent","Combat Skill, Ultimate Lv. +2 / Max Lv. +2."],["A4","—","Following in the Footsteps","After attacking Kaiju in Gunshot Wound state, DMG dealt +15% (2 turns)."],["A5","—","Resolute Action","Normal Attack, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","—","Latent Potential","Before Ultimate, 100% chance DMG Taken Increase +15% (1 turn) to target."]],
     statusNotes:["Gunshot Wound — After applier's Combat Skill / Ultimate, deals Shot Additional DMG."] },
 
-  // ── RIN SHINONOME ────────────────────────────────────────────────────────
   { id:"rs-aah", name:"Rin Shinonome", variant:"Aspiration and Honor", parent:"Rin Shinonome",
     role:"Attacker", type:["Shot"], ailment:"—",
     weapons:["GG-5012","GG-Iapetus","GG-Squirrel 02"],
@@ -617,7 +610,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★★","Skillful Coordination","After causing Core Exposed, CRIT Rate +20% (2 turns)."],["A2","★★★","Will to Win","When attacking Kaiju with ≥50% HP, DMG dealt +20%."],["A3","★★★","Aspiration Born from Admiration","Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A4","★★★★★","Further Exertion","DMG dealt buff max stack count +2."],["A5","★★★","Hidden Feelings","Normal Attack, Combat Skill, Ultimate Lv. +2 / Max Lv. +2."],["A6","★★★★","My Honor","After Combat Skill: CRIT DMG +20% (1 turn) and Ultimate Gauge +20."]],
     statusNotes:[] },
 
-  // ── RYO IKARUGA ──────────────────────────────────────────────────────────
   { id:"ri2-pr", name:"Ryo Ikaruga", variant:"Passion and Responsibility", parent:"Ryo Ikaruga",
     role:"Supporter", type:["Shot"], ailment:"—",
     weapons:["AR-Hyperion","AR-Panther 33","—"],
@@ -635,7 +627,6 @@ const CHARACTERS = [
     ascensions:[["A1","★★★★","Good Start","Battle start: SPD +10% (2 turns) to self."],["A2","★★★","Emphasis on Mobility","Normal Attack DMG Multiplier +20%."],["A3","★★★","Overflowing Sense of Responsibility","Normal Attack, Ultimate Lv. +2 / Max Lv. +2."],["A4","★★★★★","Overwhelming Enthusiasm","Ultimate buff duration +1 turn."],["A5","★★★","Platoon Leader's Duty","Combat Skill, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Frontline Command","All allies' DMG dealt +10%."]],
     statusNotes:[] },
 
-  // ── SAGAN SHINOMIYA ──────────────────────────────────────────────────────
   { id:"ss-ddd", name:"Sagan Shinomiya", variant:"Dimensionally Distorted Destiny", parent:"Sagan Shinomiya",
     role:"Defender", type:["Blunt","Fire"], ailment:"Burn",
     weapons:["SH-luggnil","SH-Euchre","Heavy Duty Shield"],
@@ -648,8 +639,8 @@ const CHARACTERS = [
       {name:"Ultimate",title:"Wrathful Inferno",desc:"Before: DEF +16.9% (2 turns) to self, ATK +10.5% (2 turns) to all allies. Deals Blunt and Fire DMG equal to 70% DEF to all Kaiju.",ugc:"300★",sp:"—",type:"Blunt / Fire",range:"AoE"},
       {name:"Follow-Up Skill",title:"Shield Charge",desc:"Deals Blunt and Fire DMG equal to 77% DEF to a single Kaiju.",ugc:60,sp:"—",type:"Blunt / Fire",range:"Single Target"},
     ],
-    passive:{name:"Kindling Inner Flame",desc:"After receiving attack: +1 Inner Flame (max 5) and counter the attacker for Blunt / Fire DMG equal to 32% DEF. Inner Flame: Ultimate DMG Multiplier +11%, DMG dealt +2.5%."},
-    addPassives:[["Lv.40 — Pledge of Revival","If incapacitated, recover 25% Max HP and resurrect (1x/battle)."],["Lv.60 — Signal for Counterattack","After countering, 80% chance to apply Burn (2 turns): Fire DoT 100% ATK."],["Lv.80 — Fiery Will to Fight","After Ultimate, recover HP equal to 5% Max HP."]],
+    passive:{name:"Kindling Inner Flame",desc:"After receiving attack: +1 Inner Flame (max 5) and counter the attacker for Blunt / Fire DMG equal to 32% DEF."},
+    addPassives:[["Lv.40 — Pledge of Revival","If incapacitated, recover 25% Max HP and resurrect (1x/battle)."],["Lv.60 — Signal for Counterattack","After countering, 80% chance to apply Burn (2 turns)."],["Lv.80 — Fiery Will to Fight","After Ultimate, recover HP equal to 5% Max HP."]],
     ascensions:[["A1","★★★★★","Same Fighting Spirit","Before Ultimate, CRIT DMG +30% (2 turns) to all allies."],["A2","★★★","Blazing Drive","If Inner Flame ≥1, on turn start: remove 1 of this unit's debuffs."],["A3","★★★","CLOZER Captain","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Smoldering Fate","Taunt duration +1. When attacking Taunt-state Kaiju, CRIT Rate +15%."],["A5","★★★","Pride of a Shinomiya","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★","Strong Will to Protect Allies","After Ultimate, Shield (2 turns) equal to 20% DEF to all allies."]],
     statusNotes:["Burn — Fire DoT at start of action.","Taunt — Cannot choose other targets.","Inner Flame — Ultimate DMG Multiplier and DMG dealt increased per stack."] },
 
@@ -660,17 +651,16 @@ const CHARACTERS = [
     medal:"Kaiju No. 6",
     skillPrio:[["Ultimate",5],["Passive Skill",5],["Combat Skill",4],["Normal Attack",3],["Follow-Up Skill",1]],
     skills:[
-      {name:"Normal Attack",title:"Resolute Thrust / Blazing Thrust",desc:"Normal: Slash DMG 55% ATK. Enhanced (Blaze state): Slash / Fire DMG equal to 15% Max HP to single Kaiju; 8% to adjacent.",ugc:60,sp:"—",type:"Slash / Fire",range:"Single / Blast"},
-      {name:"Combat Skill",title:"Over Limit Strike",desc:"Before: consume 30% Max HP, apply Blaze (2 turns): DMG dealt −20.3%, Normal Attack becomes Enhanced. Deals Slash / Fire DMG equal to 63% Max HP to single Kaiju and adjacent.",ugc:60,sp:1,type:"Slash / Fire",range:"Blast"},
-      {name:"Ultimate",title:"All-In Throw",desc:"Before: Ardor (3 turns) to self, CRIT DMG +11% (3 turns) to all allies. Deals Slash / Fire DMG equal to 46% Max HP to all Kaiju. Ardor: after ally activates Ultimate, DMG dealt +4.2% (3 turns, max 3 stacks).",ugc:"300★",sp:"—",type:"Slash / Fire",range:"AoE"},
+      {name:"Normal Attack",title:"Resolute Thrust / Blazing Thrust",desc:"Normal: Slash DMG 55% ATK. Enhanced (Blaze): Slash / Fire DMG equal to 15% Max HP.",ugc:60,sp:"—",type:"Slash / Fire",range:"Single / Blast"},
+      {name:"Combat Skill",title:"Over Limit Strike",desc:"Before: consume 30% Max HP, apply Blaze (2 turns). Deals Slash / Fire DMG equal to 63% Max HP to single Kaiju and adjacent.",ugc:60,sp:1,type:"Slash / Fire",range:"Blast"},
+      {name:"Ultimate",title:"All-In Throw",desc:"Before: Ardor (3 turns) to self, CRIT DMG +11% (3 turns) to all allies. Deals Slash / Fire DMG equal to 46% Max HP to all Kaiju.",ugc:"300★",sp:"—",type:"Slash / Fire",range:"AoE"},
       {name:"Follow-Up Skill",title:"Flame-Clad Pierce",desc:"Deals Slash and Fire DMG equal to 77% Max HP to a single Kaiju.",ugc:60,sp:"—",type:"Slash / Fire",range:"Single Target"},
     ],
-    passive:{name:"Encroaching Resolve",desc:"Each 400 HP lost: Ultimate DMG Multiplier +3.3% (max 5), Enhanced Normal Attack DMG Multiplier +1.2% (max 5), all allies' Ultimate DMG dealt +3.3% (max 5). After Enhanced Normal Attack, all allies' Ultimate Gauge +27."},
+    passive:{name:"Encroaching Resolve",desc:"Each 400 HP lost: buffs activated. After Enhanced Normal Attack, all allies' Ultimate Gauge +27."},
     addPassives:[["Lv.40 — Long-Standing Vendetta","Battle start: Ardor (3 turns) to self."],["Lv.60 — Assimilated Power","Max HP +24%."],["Lv.80 — Alternate Form","For every 200 HP over 2,000, CRIT Rate +3% (max +36%)."]],
-    ascensions:[["A1","★★★★★","Rekindled Will","After Combat Skill, CRIT Rate +20% (2 turns). Enhanced Normal Attack and Ultimate DMG dealt +30%."],["A2","★★★★★","Choice to Entrust","While in Ardor state, all allies' DEF PEN Rate +24%."],["A3","★★★","Recalled Ideals","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★","Blight Incineration","After Ultimate, remove all debuffs and ailments from self and battle buddy."],["A5","★★★","Victory for All","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Burning Vow of Protection","While in Blaze state, CRIT DMG from Enhanced Normal Attack and Ultimate +150%."]],
+    ascensions:[["A1","★★★★★","Rekindled Will","After Combat Skill, CRIT Rate +20% (2 turns)."],["A2","★★★★★","Choice to Entrust","While in Ardor state, all allies' DEF PEN Rate +24%."],["A3","★★★","Recalled Ideals","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★","Blight Incineration","After Ultimate, remove all debuffs and ailments from self and battle buddy."],["A5","★★★","Victory for All","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Burning Vow of Protection","While in Blaze state, CRIT DMG from Enhanced Normal Attack and Ultimate +150%."]],
     statusNotes:["Ardor — After ally activates Ultimate, DMG dealt increased.","Blaze — DMG dealt reduced; Normal Attack becomes Enhanced."] },
 
-  // ── SOSHIRO HOSHINA ──────────────────────────────────────────────────────
   { id:"sh-atp", name:"Soshiro Hoshina", variant:"Ax Technique Proficiency", parent:"Soshiro Hoshina",
     role:"Supporter", type:["Slash"], ailment:"Fear / Tremble",
     weapons:["Ax-0087","Ax-Bison 91","Ax-Var"],
@@ -685,7 +675,7 @@ const CHARACTERS = [
     ],
     passive:{name:"Aura of Intimidation",desc:"Battle start: Ultimate Gauge +150. All allies' DMG dealt +5.5%. After ally attacks, 80% chance to apply Fear (1 turn, max 4 stacks): after ally attacks, Slash Additional DMG equal to 5.5% ATK × stack count."},
     addPassives:[["Lv.40 — Precision Ax Work","CRIT Rate increased by 100% of Effect Hit Rate (max +60%)."],["Lv.60 — Menacing Demeanor","After Normal Attack, Ultimate Gauge +20."],["Lv.80 — Merciless Combat Style","After Normal Attack or Follow-Up Skill, 80% chance to apply Fear to all Kaiju."]],
-    ascensions:[["A1","★★★★","Manifestation of Might","Tremble also reduces Effect RES −20%. Each Tremble-state Kaiju defeated: Ultimate Gauge +10."],["A2","★★★★★","Grasp of the Battlefield","Tremble also grants DMG Taken from Additional DMG +30%."],["A3","★★★","Proficiency in Application","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Unstoppable Advance","Additional DMG CRIT DMG +46%."],["A5","★★★","Art of Close Combat","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Overwhelming Battle Aura","Slash Additional DMG Multiplier per Fear stack +10%."]],
+    ascensions:[["A1","★★★★","Manifestation of Might","Tremble also reduces Effect RES −20%."],["A2","★★★★★","Grasp of the Battlefield","Tremble also grants DMG Taken from Additional DMG +30%."],["A3","★★★","Proficiency in Application","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Unstoppable Advance","Additional DMG CRIT DMG +46%."],["A5","★★★","Art of Close Combat","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Overwhelming Battle Aura","Slash Additional DMG Multiplier per Fear stack +10%."]],
     statusNotes:["Fear — After ally attacks, Slash Additional DMG based on ATK × stack count.","Tremble — DMG Taken from Additional DMG increased."] },
 
   { id:"sh-bs", name:"Soshiro Hoshina", variant:"Blade Specialist", parent:"Soshiro Hoshina",
@@ -714,7 +704,7 @@ const CHARACTERS = [
     skills:[
       {name:"Normal Attack",title:"Wild Slashes",desc:"Deals Slash DMG equal to 55% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Slash",range:"Single Target"},
       {name:"Combat Skill",title:"Double Attack",desc:"Deals Slash DMG equal to 64% ATK to all Kaiju.",ugc:90,sp:1,type:"Slash",range:"AoE"},
-      {name:"Ultimate",title:"Eightfold Slasher",desc:"CRIT Rate +16% for this attack. Deals Slash DMG equal to 224% ATK to single Kaiju. While in Fierce state, advances Action Order by 20%.",ugc:"300★",sp:"—",type:"Slash",range:"Single Target"},
+      {name:"Ultimate",title:"Eightfold Slasher",desc:"CRIT Rate +16% for this attack. Deals Slash DMG equal to 224% ATK to single Kaiju.",ugc:"300★",sp:"—",type:"Slash",range:"Single Target"},
       {name:"Follow-Up Skill",title:"Supreme Speed Strike",desc:"Deals Slash DMG equal to 66% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Slash",range:"Single Target"},
     ],
     passive:{name:"Make It Quick",desc:"After defeating Kaiju, ATK +11% (2 turns). After Combat Skill, applies Fierce: CRIT Rate +11%, CRIT DMG +16%. After Normal Attack, Fierce is removed."},
@@ -730,13 +720,13 @@ const CHARACTERS = [
     skillPrio:[["Passive Skill",5],["Combat Skill",4],["Ultimate",4],["Normal Attack",1],["Follow-Up Skill",1]],
     skills:[
       {name:"Normal Attack",title:"Dragonfly Return",desc:"Deals Slash DMG equal to 55% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Slash",range:"Single Target"},
-      {name:"Combat Skill",title:"Kamaitachi",desc:"Deals Slash and Wind DMG equal to 116% ATK to single Kaiju; 29% to adjacent. 100% chance to apply Windbite (2 turns): Wind DoT 12.8% ATK.",ugc:90,sp:1,type:"Slash / Wind",range:"Blast"},
+      {name:"Combat Skill",title:"Kamaitachi",desc:"Deals Slash and Wind DMG equal to 116% ATK to single Kaiju; 29% to adjacent. 100% chance to apply Windbite (2 turns).",ugc:90,sp:1,type:"Slash / Wind",range:"Blast"},
       {name:"Ultimate",title:"Pinwheel Vortex",desc:"Before: +3 Opening stacks to single Kaiju. Deals Slash and Wind DMG equal to 442% ATK to single Kaiju.",ugc:"300★",sp:"—",type:"Slash / Wind",range:"Single Target"},
       {name:"Follow-Up Skill",title:"Mountain Storm",desc:"Deals Slash and Wind DMG equal to 77% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Slash / Wind",range:"Single Target"},
     ],
-    passive:{name:"Insight to Pierce Openings",desc:"After attacking: +1 Opening (max 10). When attacking Kaiju in Windbite state: +2 Opening. [3+] CRIT Rate +13.3%. [5+] After Combat Skill, advance Action Order by 50% (1x every 2 turns). [10] CRIT DMG +33%, Ultimate DMG Multiplier +44%."},
+    passive:{name:"Insight to Pierce Openings",desc:"After attacking: +1 Opening (max 10). When attacking Kaiju in Windbite state: +2 Opening. [3+] CRIT Rate +13.3%. [5+] advance Action Order. [10] CRIT DMG +33%, Ultimate DMG Multiplier +44%."},
     addPassives:[["Lv.40 — Keen Sharpness","CRIT DMG increased by 300% of Effect Hit Rate (max +180%)."],["Lv.60 — Foresight Technique","Wave start: +2 Opening to all Kaiju."],["Lv.80 — Rising Storm","After attacking, Combat Skill DMG dealt +10% (max 5 stacks)."]],
-    ascensions:[["A1","★★★★★","Gale of the Kamaitachi","DEF PEN Rate +16%. Wave start: 100% chance Windbite (1 turn) to all Kaiju."],["A2","★★★★","Opening-Cleaving Blade","When Combat Skill vs Kaiju with 5+ Opening stacks, Combat Skill DMG dealt +30%."],["A3","★★★","Proficiency in Shuriken","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★","Transition Energy Utilization","After Ultimate or Follow-Up Skill, SPD +12% (2 turns)."],["A5","★★★","A New Horizon","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Realm of Masterful Art","After Combat Skill, +1 Opening to target. After attacking, Wind DMG dealt +7% (max 5 stacks)."]],
+    ascensions:[["A1","★★★★★","Gale of the Kamaitachi","DEF PEN Rate +16%. Wave start: 100% chance Windbite to all Kaiju."],["A2","★★★★","Opening-Cleaving Blade","When Combat Skill vs Kaiju with 5+ Opening stacks, Combat Skill DMG dealt +30%."],["A3","★★★","Proficiency in Shuriken","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★","Transition Energy Utilization","After Ultimate or Follow-Up Skill, SPD +12% (2 turns)."],["A5","★★★","A New Horizon","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Realm of Masterful Art","After Combat Skill, +1 Opening to target."]],
     statusNotes:["Windbite — Wind DoT at start of action.","Opening — Effects activate at 3 / 5 / 10 stacks."] },
 
   { id:"sh-uf", name:"Soshiro Hoshina", variant:"United Front", parent:"Soshiro Hoshina",
@@ -747,16 +737,15 @@ const CHARACTERS = [
     skillPrio:[["Combat Skill",5],["Passive Skill",5],["Ultimate",4],["Normal Attack",1],["Follow-Up Skill",1]],
     skills:[
       {name:"Normal Attack",title:"Air Slicer",desc:"Deals Slash DMG equal to 55% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Slash",range:"Single Target"},
-      {name:"Combat Skill",title:"Fleeting Slasher / Synchronized Swordplay",desc:"Normal: Slash DMG 131% ATK (single) + 66% (adjacent), advance Action Order +10%. Enhanced (Resonance): Slash DMG dealt +12.8%, deals 230% ATK to single Kaiju.",ugc:90,sp:1,type:"Slash",range:"Blast / ST"},
-      {name:"Ultimate",title:"12-Layered Strike",desc:"Deals Slash DMG equal to 420% ATK to single Kaiju. If ≤2 Kaiju on field, applies Resonance: Combat Skill enhanced. If ≥3 Kaiju remain after Ultimate, Resonance is removed.",ugc:"300★",sp:"—",type:"Slash",range:"Single Target"},
+      {name:"Combat Skill",title:"Fleeting Slasher / Synchronized Swordplay",desc:"Normal: Slash DMG 131% ATK + 66% adjacent. Enhanced (Resonance): Slash DMG dealt +12.8%, deals 230% ATK to single Kaiju.",ugc:90,sp:1,type:"Slash",range:"Blast / ST"},
+      {name:"Ultimate",title:"12-Layered Strike",desc:"Deals Slash DMG equal to 420% ATK to single Kaiju. If ≤2 Kaiju on field, applies Resonance: Combat Skill enhanced.",ugc:"300★",sp:"—",type:"Slash",range:"Single Target"},
       {name:"Follow-Up Skill",title:"Return Slasher",desc:"Deals Slash DMG equal to 77% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Slash",range:"Single Target"},
     ],
     passive:{name:"Synchronized Spirit",desc:"While not in Resonance state: Ultimate Gauge Charge Rate +11%. While in Resonance state: CRIT DMG +22%."},
-    addPassives:[["Lv.40 — Ultimate State","After Ultimate, applies Slash Additional DMG state (1 time: Slash Additional DMG 30% ATK, then removes state)."],["Lv.60 — Valiance in Adversity","When HP ≥50%, Slash DMG dealt +15%."],["Lv.80 — Kindred Spirits","While in Resonance state, Ultimate DMG dealt +15%."]],
+    addPassives:[["Lv.40 — Ultimate State","After Ultimate, applies Slash Additional DMG state (1 time)."],["Lv.60 — Valiance in Adversity","When HP ≥50%, Slash DMG dealt +15%."],["Lv.80 — Kindred Spirits","While in Resonance state, Ultimate DMG dealt +15%."]],
     ascensions:[["A1","★★★★★","Polished Technique","Before Combat Skill, CRIT Rate +25% (1 turn)."],["A2","★★★★","Honed Senses","Before Ultimate or Follow-Up Skill, ATK +15% (max 5 stacks)."],["A3","★★★","Unexpected Combination","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★","The Path Forged","After defeating Kaiju, Ultimate Gauge +45."],["A5","★★★","Critical Realization","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Joy of Combat","After Ultimate, CRIT DMG +100% (2 turns)."]],
     statusNotes:["Resonance — Combat Skill becomes Enhanced."] },
 
-  // ── SUITED ───────────────────────────────────────────────────────────────
   { id:"suited-uc", name:"Suited", variant:"Unbridled Curiosity", parent:"Suited",
     role:"Attacker", type:["Blunt"], ailment:"—",
     weapons:["HM-Eporhtnacyl","HM-Holdem","Standard Hammer"],
@@ -765,16 +754,15 @@ const CHARACTERS = [
     skillPrio:[["Combat Skill",5],["Passive Skill",5],["Ultimate",4],["Normal Attack",2],["Follow-Up Skill",1]],
     skills:[
       {name:"Normal Attack",title:"Swing for the Dream",desc:"Deals Blunt DMG equal to 55% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Blunt",range:"Single Target"},
-      {name:"Combat Skill",title:"Free-Spirited Slam",desc:"Deals Blunt DMG equal to 75% ATK to single Kaiju and adjacent. After attacking, applies Mark (2 turns): DMG Taken from Follow-Up Skill and Extra Attack +19.2%.",ugc:90,sp:1,type:"Blunt",range:"Blast"},
+      {name:"Combat Skill",title:"Free-Spirited Slam",desc:"Deals Blunt DMG equal to 75% ATK to single Kaiju and adjacent. After attacking, applies Mark (2 turns).",ugc:90,sp:1,type:"Blunt",range:"Blast"},
       {name:"Ultimate",title:"Suited's Special Bombs",desc:"Deals Blunt DMG equal to 336% ATK to single Kaiju; 168% to adjacent. After attacking, applies 7 stacks of Chips.",ugc:"300★",sp:"—",type:"Blunt",range:"Blast"},
       {name:"Follow-Up Skill",title:"Calculated Hammer Strike",desc:"Deals Blunt DMG equal to 77% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Blunt",range:"Single Target"},
     ],
-    passive:{name:"Born Gambler",desc:"Battle start: 7 Chips (max 7). After Normal Attack or Combat Skill: Extra Attack + consume 1 Chip. After ally attacks with Combat Skill / Ultimate / Extra Attack / Counter: 52% fixed chance Extra Attack + consume 1 Chip. Extra Attack: Blunt DMG 23% ATK to all Kaiju."},
+    passive:{name:"Born Gambler",desc:"Battle start: 7 Chips (max 7). After Normal Attack or Combat Skill: Extra Attack + consume 1 Chip. Extra Attack: Blunt DMG 23% ATK to all Kaiju."},
     addPassives:[["Lv.40 — High Energy","After Ultimate, ATK +25% (2 turns)."],["Lv.60 — Restless Curiosity","After Extra Attack vs Kaiju in Mark state, Ultimate Gauge +10."],["Lv.80 — Theoretical Output","After Extra Attack, Follow-Up Skill and Extra Attack DMG dealt +15% to all allies (max 3 stacks)."]],
-    ascensions:[["A1","★★★★","Destructive Logic","When attacking Kaiju in Mark state, DEF PEN Rate +26%."],["A2","★★★★★","Eager Anticipation","After Extra Attack, CRIT DMG +25% (1 turn) to all allies."],["A3","★★★","Theoretical Foundations","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★★","All-In","Before Ultimate: Combat Skill DMG Multiplier +25% (2 turns), Extra Attack DMG Multiplier +70% (2 turns)."],["A5","★★★","Endless Research","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Bursting Ambition","Chips max stack +3. After Ultimate, additionally +3 Chips. Blunt DMG from Extra Attack +25%."]],
+    ascensions:[["A1","★★★★","Destructive Logic","When attacking Kaiju in Mark state, DEF PEN Rate +26%."],["A2","★★★★★","Eager Anticipation","After Extra Attack, CRIT DMG +25% (1 turn) to all allies."],["A3","★★★","Theoretical Foundations","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★★","All-In","Before Ultimate: Combat Skill and Extra Attack DMG Multiplier increased."],["A5","★★★","Endless Research","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Bursting Ambition","Chips max stack +3. After Ultimate, additionally +3 Chips."]],
     statusNotes:["Chips — Activates Extra Attack; consumed per activation.","Mark — DMG Taken from Follow-Up Skill and Extra Attack increased."] },
 
-  // ── TAE NAKANOSHIMA ──────────────────────────────────────────────────────
   { id:"tn-kpl", name:"Tae Nakanoshima", variant:"The Keen-Eyed Platoon Leader", parent:"Tae Nakanoshima",
     role:"Attacker", type:["Shot","Fire"], ailment:"Burn",
     weapons:["AR-Hyperion","AR-Cronus","AR-Narwhal 59"],
@@ -783,16 +771,15 @@ const CHARACTERS = [
     skillPrio:[["Combat Skill",4],["Ultimate",3],["Passive Skill",3],["Normal Attack",2],["Follow-Up Skill",1]],
     skills:[
       {name:"Normal Attack",title:"Aggressive Shot",desc:"Deals Shot DMG equal to 55% ATK to a single Kaiju.",ugc:66,sp:"—",type:"Shot",range:"Single Target"},
-      {name:"Combat Skill",title:"Blazing Fire Shot",desc:"Deals Shot and Fire DMG equal to 65% ATK to single Kaiju. 80% chance to apply Burn (2 turns): Fire DoT 39% ATK.",ugc:99,sp:1,type:"Shot / Fire",range:"Single Target"},
+      {name:"Combat Skill",title:"Blazing Fire Shot",desc:"Deals Shot and Fire DMG equal to 65% ATK to single Kaiju. 80% chance to apply Burn (2 turns).",ugc:99,sp:1,type:"Shot / Fire",range:"Single Target"},
       {name:"Ultimate",title:"Heat Grenade",desc:"Before: DMG dealt +5.5% (3 turns), DoT DMG Multiplier +16.5% (3 turns) to self. Deals Shot and Fire DMG equal to 124% ATK to single Kaiju.",ugc:"300★",sp:"—",type:"Shot / Fire",range:"Single Target"},
       {name:"Follow-Up Skill",title:"Passionate Shot",desc:"Deals Shot and Fire DMG equal to 55% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Shot / Fire",range:"Single Target"},
     ],
     passive:{name:"Fervent Drive",desc:"After Normal Attack or Ultimate vs Kaiju in Burn state, ATK +27.5% (1 turn)."},
     addPassives:[["Lv.40 — Secret Motive","DoT DMG Multiplier +40%."],["Lv.60 — Overheated Fighting Spirit","Effect Hit Rate +16%."],["Lv.80 — Increasing Blaze","Each PLT destroyed: Ultimate Gauge +10."]],
-    ascensions:[["A1","★★★","Ample Stamina","After Ultimate, Ultimate Gauge Charge Rate +20% (2 turns)."],["A2","★★★","Penetrating Gaze","After attacking Kaiju in Burn state, DMG dealt +20% (2 turns)."],["A3","★★★","Cougar Mode","Normal Attack, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Firm Stance","When Burn application fails from Combat Skill, Effect Hit Rate +40% (1 turn). 1x every 2 turns."],["A5","★★★","Platoon Leader's Pride","Combat Skill, Ultimate Lv. +2 / Max Lv. +2."],["A6","★★★★★","Expanded Heatwave","After Ultimate, 65% chance to apply Burn (2 turns) to single Kaiju and adjacent."]],
+    ascensions:[["A1","★★★","Ample Stamina","After Ultimate, Ultimate Gauge Charge Rate +20% (2 turns)."],["A2","★★★","Penetrating Gaze","After attacking Kaiju in Burn state, DMG dealt +20% (2 turns)."],["A3","★★★","Cougar Mode","Normal Attack, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Firm Stance","When Burn application fails, Effect Hit Rate +40% (1 turn)."],["A5","★★★","Platoon Leader's Pride","Combat Skill, Ultimate Lv. +2 / Max Lv. +2."],["A6","★★★★★","Expanded Heatwave","After Ultimate, 65% chance to apply Burn to single Kaiju and adjacent."]],
     statusNotes:["Burn — Fire DoT at start of action."] },
 
-  // ── WANG MEIXING ─────────────────────────────────────────────────────────
   { id:"wm-nwc", name:"Wang Meixing", variant:"Negotiator of Wit and Charm", parent:"Wang Meixing",
     role:"Supporter", type:["Shot","Lightning"], ailment:"Shock Wire",
     weapons:["AR-Gnijiluh","AR-Hyperion","AR-Narwhal 59"],
@@ -801,16 +788,15 @@ const CHARACTERS = [
     skillPrio:[["Ultimate",5],["Passive Skill",5],["Combat Skill",4],["Follow-Up Skill",2],["Normal Attack",1]],
     skills:[
       {name:"Normal Attack",title:"Lightning Wire Shot",desc:"Deals Shot and Lightning DMG equal to 34% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Shot / Lightning",range:"Single Target"},
-      {name:"Combat Skill",title:"Shock Net",desc:"Deals Shot and Lightning DMG equal to 15% ATK to all Kaiju. 80% chance to apply Shock Wire (2 turns): DoT taken +8%, Lightning DoT 44% ATK.",ugc:90,sp:1,type:"Shot / Lightning",range:"AoE"},
+      {name:"Combat Skill",title:"Shock Net",desc:"Deals Shot and Lightning DMG equal to 15% ATK to all Kaiju. 80% chance to apply Shock Wire (2 turns).",ugc:90,sp:1,type:"Shot / Lightning",range:"AoE"},
       {name:"Ultimate",title:"Anti-Kaiju Mass Orbital Weapon: Tianxie",desc:"Deals Shot and Lightning DMG equal to 82% ATK to all Kaiju. 80% chance to apply Shock Wire (3 turns).",ugc:"300★",sp:"—",type:"Shot / Lightning",range:"AoE"},
       {name:"Follow-Up Skill",title:"Snare Shot",desc:"Deals Shot and Lightning DMG equal to 77% ATK to a single Kaiju.",ugc:60,sp:"—",type:"Shot / Lightning",range:"Single Target"},
     ],
-    passive:{name:"Absolute Wires",desc:"After Combat Skill, 80% chance to apply Shock Wire (2 turns). Based on highest debuff/ailment count on any Kaiju: [2+] 80% chance DMG Taken Increase +5.5% (2 turns) to all Kaiju; [4+] DoT DMG Multiplier +16.5% (1 turn) to all allies; [6+] DEF PEN Rate +7.8% (1 turn) to all allies."},
+    passive:{name:"Absolute Wires",desc:"After Combat Skill, 80% chance to apply Shock Wire. Based on highest debuff/ailment count: [2+] DMG Taken Increase +5.5%; [4+] DoT DMG Multiplier +16.5% to all allies; [6+] DEF PEN Rate +7.8% to all allies."},
     addPassives:[["Lv.40 — Dominant Demeanor","After Combat Skill vs Kaiju in Shock Wire state, 50% chance SP +1."],["Lv.60 — Thorough Preparation","Battle start: Ultimate Gauge +60."],["Lv.80 — Adept Technique","DMG dealt increased by 80% of Effect Hit Rate (max +56%)."]],
-    ascensions:[["A1","★★★★","Electrifying Stratagem","After Ultimate, 100% chance ATK −15% (3 turns) to target."],["A2","★★★★★","Arrangements Complete","When ally attacks Kaiju in Shock Wire state, ally's DMG dealt +15%."],["A3","★★★","CLOZER's Intel Specialist","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Plan in Orbit","Each time Kaiju takes DoT, Ultimate Gauge +4."],["A5","★★★","Unseen Effort","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Exceeding Expectations","After Ultimate, 100% chance DEF −20% (3 turns) to target. DoT DMG Multiplier +50%."]],
+    ascensions:[["A1","★★★★","Electrifying Stratagem","After Ultimate, 100% chance ATK −15% (3 turns) to target."],["A2","★★★★★","Arrangements Complete","When ally attacks Kaiju in Shock Wire state, ally's DMG dealt +15%."],["A3","★★★","CLOZER's Intel Specialist","Normal Attack, Combat Skill Lv. +2 / Max Lv. +2."],["A4","★★★★","Plan in Orbit","Each time Kaiju takes DoT, Ultimate Gauge +4."],["A5","★★★","Unseen Effort","Ultimate, Passive, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Exceeding Expectations","After Ultimate, 100% chance DEF −20% (3 turns). DoT DMG Multiplier +50%."]],
     statusNotes:["Shock Wire — DMG taken from DoT increased; Lightning DoT at start of action."] },
 
-  // ── ZOEE WANDERFALKE ─────────────────────────────────────────────────────
   { id:"zw-wu", name:"Zoee Wanderfalke", variant:"The Weapon Unsealed", parent:"Zoee Wanderfalke",
     role:"Attacker", type:["Shot","Slash"], ailment:"—",
     weapons:["RF-Mruwdnil","RF-Judith","Sustained Combat Ride-Frame"],
@@ -819,22 +805,21 @@ const CHARACTERS = [
     skillPrio:[["Combat Skill",5],["Passive Skill",5],["Ultimate",4],["Normal Attack",1],["Follow-Up Skill",1]],
     skills:[
       {name:"Normal Attack",title:"Fierce Impalement",desc:"Deals Shot DMG equal to 23% Max HP to a single Kaiju.",ugc:60,sp:"—",type:"Shot",range:"Single Target"},
-      {name:"Combat Skill",title:"Dual-Armament Strike / Impulsive Onslaught",desc:"Normal: Slash / Shot DMG 75% Max HP (single) + 12% (adjacent). Enhanced (Berserk): no SP cost, consumes 5% Max HP, deals 87% Max HP (single) + 15% (adjacent).",ugc:90,sp:"1 / 0",type:"Slash / Shot",range:"Blast"},
-      {name:"Ultimate",title:"Ecstatic Railgun",desc:"Before: consumes 60% Max HP (HP becomes 1 if insufficient). Deals Slash / Shot DMG equal to 208% Max HP (single) + 48% (adjacent). After: Shield (2 turns) equal to 40% Max HP.",ugc:"300★",sp:"—",type:"Shot / Slash",range:"Blast"},
+      {name:"Combat Skill",title:"Dual-Armament Strike / Impulsive Onslaught",desc:"Normal: Slash / Shot DMG 75% Max HP. Enhanced (Berserk): no SP cost, consumes 5% Max HP, deals 87% Max HP.",ugc:90,sp:"1 / 0",type:"Slash / Shot",range:"Blast"},
+      {name:"Ultimate",title:"Ecstatic Railgun",desc:"Before: consumes 60% Max HP. Deals Slash / Shot DMG equal to 208% Max HP to single Kaiju; 48% to adjacent. After: Shield (2 turns) equal to 40% Max HP.",ugc:"300★",sp:"—",type:"Shot / Slash",range:"Blast"},
       {name:"Follow-Up Skill",title:"Thrilling Pursuit",desc:"Deals Slash and Shot DMG equal to 34% Max HP to a single Kaiju.",ugc:60,sp:"—",type:"Shot / Slash",range:"Single Target"},
     ],
-    passive:{name:"Inner Persona",desc:"Each 20% Max HP lost: DMG dealt +2.3% (max 6 stacks). After Ultimate, applies Berserk (3 turns): CRIT Rate +60%, Shot DMG dealt +20%, Combat Skill → Enhanced; can only use Enhanced Combat Skill, Ultimate, Follow-Up."},
+    passive:{name:"Inner Persona",desc:"Each 20% Max HP lost: DMG dealt +2.3% (max 6 stacks). After Ultimate, applies Berserk (3 turns): CRIT Rate +60%, Shot DMG dealt +20%, Combat Skill → Enhanced."},
     addPassives:[["Lv.40 — Unrestrained Momentum","After Ultimate, SPD +25% (3 turns)."],["Lv.60 — Last-Stand Exhilaration","When HP ≤30%, DMG Taken Reduction +20%."],["Lv.80 — Savage Instinct","Enhanced Combat Skill CRIT DMG +20%."]],
-    ascensions:[["A1","★★★★★","Breakthrough Will","Battle start: Ultimate Gauge +90. Each 20% Max HP lost: CRIT DMG +10% (max 5 stacks)."],["A2","★★★★★","Chain of Annihilation","After Enhanced Combat Skill, advance Action Order by 50% (1x every 2 turns)."],["A3","★★★","Battle-Hungry Instinct","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★","Absorbed Aggression","Shield Application Multiplier +50%. Ultimate Shield duration +1 turn."],["A5","★★★","Berserker Unleashed","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Exultation in Extremis","Before Ultimate: Enhanced Combat Skill DMG Multiplier +30% (3 turns), Ultimate DMG Multiplier +30% (3 turns)."]],
-    statusNotes:["Berserk — CRIT Rate and Shot DMG dealt increased; Combat Skill becomes Enhanced; restricted skill usage."] },
+    ascensions:[["A1","★★★★★","Breakthrough Will","Battle start: Ultimate Gauge +90. Each 20% Max HP lost: CRIT DMG +10% (max 5 stacks)."],["A2","★★★★★","Chain of Annihilation","After Enhanced Combat Skill, advance Action Order by 50%."],["A3","★★★","Battle-Hungry Instinct","Normal Attack, Passive Lv. +2 / Max Lv. +2."],["A4","★★★★","Absorbed Aggression","Shield Application Multiplier +50%. Ultimate Shield duration +1 turn."],["A5","★★★","Berserker Unleashed","Combat Skill, Ultimate, Follow-Up Skill Lv. +2 / Max Lv. +2."],["A6","★★★★★","Exultation in Extremis","Before Ultimate: Enhanced Combat Skill and Ultimate DMG Multiplier +30% (3 turns)."]],
+    statusNotes:["Berserk — CRIT Rate and Shot DMG dealt increased; Combat Skill becomes Enhanced."] },
 ];
 
 const PARENTS = [...new Set(CHARACTERS.map(c => c.parent))];
-
-// ── COMPONENTS ───────────────────────────────────────────────────────────────
+const ROLES = ["All","Attacker","Defender","Supporter"];
 
 function Stars({ n }) {
-  return <span style={{color:"#f0c030",letterSpacing:"1px",fontSize:"12px"}}>{"★".repeat(n)}{"☆".repeat(5-n)}</span>;
+  return <span style={{color:TEAL,letterSpacing:"1px",fontSize:"12px"}}>{"★".repeat(n)}{"☆".repeat(5-n)}</span>;
 }
 
 function TypePill({ type }) {
@@ -855,19 +840,24 @@ function TypePill({ type }) {
 }
 
 function CharacterCard({ char, onClick }) {
-  const rc = ROLE_COLOR[char.role] || "#fff";
+  const rc = ROLE_COLOR[char.role] || TEAL;
   const [hov, setHov] = useState(false);
   return (
     <div onClick={() => onClick(char)}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{background: hov ? "#111d2c" : "#0d1620",
-        border: `1px solid ${hov ? rc+"66" : "#1c2d40"}`,
-        borderLeft:`3px solid ${rc}`,borderRadius:"6px",padding:"14px 15px",
-        cursor:"pointer",transition:"all 0.15s ease"}}>
+      style={{
+        background: hov ? "#0a1e1c" : BG2,
+        borderTop: `1px solid ${hov ? BORDER2 : BORDER}`,
+        borderRight: `1px solid ${hov ? BORDER2 : BORDER}`,
+        borderBottom: `1px solid ${hov ? BORDER2 : BORDER}`,
+        borderLeft: `3px solid ${rc}`,
+        borderRadius:"6px", padding:"14px 15px",
+        cursor:"pointer", transition:"all 0.15s ease"
+      }}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"8px"}}>
         <div style={{minWidth:0}}>
-          <div style={{fontSize:"11px",color:"#6a8099",textTransform:"uppercase",letterSpacing:"0.5px",marginBottom:"2px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{char.name}</div>
-          <div style={{fontSize:"14px",color:"#d4e0ee",fontWeight:"700",lineHeight:"1.3"}}>{char.variant}</div>
+          <div style={{fontSize:"11px",color:MUTED,textTransform:"uppercase",letterSpacing:"0.5px",marginBottom:"2px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{char.name}</div>
+          <div style={{fontSize:"14px",color:TEXT,fontWeight:"700",lineHeight:"1.3"}}>{char.variant}</div>
         </div>
         <span style={{background:ROLE_BG[char.role],color:rc,padding:"2px 7px",borderRadius:"3px",
           fontSize:"10px",fontWeight:"700",letterSpacing:"0.8px",textTransform:"uppercase",flexShrink:0,marginLeft:"8px",whiteSpace:"nowrap"}}>
@@ -876,7 +866,7 @@ function CharacterCard({ char, onClick }) {
       </div>
       <div style={{display:"flex",flexWrap:"wrap",gap:"3px",alignItems:"center"}}>
         <TypePill type={char.type.join(" / ")} />
-        {char.ailment !== "—" && <span style={{color:"#6a8099",fontSize:"10px",marginLeft:"3px"}}>· {char.ailment}</span>}
+        {char.ailment !== "—" && <span style={{color:MUTED,fontSize:"10px",marginLeft:"3px"}}>· {char.ailment}</span>}
       </div>
     </div>
   );
@@ -886,7 +876,7 @@ function Section({ title, children }) {
   return (
     <div style={{marginBottom:"22px"}}>
       <div style={{fontSize:"9px",fontWeight:"700",letterSpacing:"2.5px",textTransform:"uppercase",
-        color:"#f0c030",borderBottom:"1px solid #1c2d40",paddingBottom:"6px",marginBottom:"11px"}}>
+        color:TEAL,borderBottom:`1px solid ${BORDER}`,paddingBottom:"6px",marginBottom:"11px"}}>
         {title}
       </div>
       {children}
@@ -897,30 +887,30 @@ function Section({ title, children }) {
 function DataRow({ label, value }) {
   return (
     <div style={{display:"flex",gap:"10px",marginBottom:"5px",alignItems:"flex-start"}}>
-      <span style={{color:"#6a8099",fontSize:"10px",textTransform:"uppercase",letterSpacing:"0.4px",
+      <span style={{color:MUTED,fontSize:"10px",textTransform:"uppercase",letterSpacing:"0.4px",
         minWidth:"100px",flexShrink:0,paddingTop:"1px"}}>{label}</span>
-      <span style={{color:"#c4d4e0",fontSize:"12px",fontFamily:"'Share Tech Mono',monospace",lineHeight:"1.5"}}>{value}</span>
+      <span style={{color:TEXT,fontSize:"12px",fontFamily:"'Share Tech Mono',monospace",lineHeight:"1.5"}}>{value}</span>
     </div>
   );
 }
 
 function SkillCard({ skill }) {
   return (
-    <div style={{background:"#08111c",border:"1px solid #1a2d3e",borderRadius:"5px",padding:"11px 13px",marginBottom:"9px"}}>
+    <div style={{background:BG4,border:`1px solid ${BORDER}`,borderRadius:"5px",padding:"11px 13px",marginBottom:"9px"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"5px",gap:"8px"}}>
         <div>
-          <span style={{color:"#f0c030",fontSize:"9px",fontWeight:"700",letterSpacing:"1px",textTransform:"uppercase"}}>{skill.name} — </span>
-          <span style={{color:"#d4e0ee",fontSize:"13px",fontWeight:"700"}}>{skill.title}</span>
+          <span style={{color:TEAL,fontSize:"9px",fontWeight:"700",letterSpacing:"1px",textTransform:"uppercase"}}>{skill.name} — </span>
+          <span style={{color:TEXT,fontSize:"13px",fontWeight:"700"}}>{skill.title}</span>
         </div>
         <div style={{display:"flex",gap:"8px",flexShrink:0,fontSize:"10px"}}>
-          <span style={{color:"#5c9ee8"}}>UGC {skill.ugc}</span>
-          {skill.sp !== "—" && <span style={{color:"#f0c030"}}>SP {skill.sp}</span>}
+          <span style={{color:TEAL2}}>UGC {skill.ugc}</span>
+          {skill.sp !== "—" && <span style={{color:TEAL}}>SP {skill.sp}</span>}
         </div>
       </div>
-      <div style={{color:"#8aa0b8",fontSize:"12px",lineHeight:"1.65",marginBottom:"7px"}}>{skill.desc}</div>
+      <div style={{color:TEXT2,fontSize:"12px",lineHeight:"1.65",marginBottom:"7px"}}>{skill.desc}</div>
       <div style={{display:"flex",gap:"6px",alignItems:"center"}}>
         <TypePill type={skill.type} />
-        <span style={{color:"#506070",fontSize:"10px"}}>{skill.range}</span>
+        <span style={{color:"#3a7068",fontSize:"10px"}}>{skill.range}</span>
       </div>
     </div>
   );
@@ -928,12 +918,12 @@ function SkillCard({ skill }) {
 
 function PassiveCard({ label, title, desc, accent }) {
   return (
-    <div style={{background:"#08111c",border:`1px solid ${accent?"#f0c03044":"#1a2d3e"}`,
-      borderLeft:accent?"3px solid #f0c030":"1px solid #1a2d3e",
+    <div style={{background:BG4,border:`1px solid ${accent ? TEAL+"44" : BORDER}`,
+      borderLeft: accent ? `3px solid ${TEAL}` : `1px solid ${BORDER}`,
       borderRadius:"5px",padding:"10px 13px",marginBottom:"7px"}}>
-      {label && <div style={{color:"#f0c030",fontSize:"9px",fontWeight:"700",letterSpacing:"1px",marginBottom:"3px"}}>{label}</div>}
-      <div style={{color:"#d4e0ee",fontSize:"12px",fontWeight:"700",marginBottom:"4px"}}>{title}</div>
-      <div style={{color:"#8aa0b8",fontSize:"11px",lineHeight:"1.6"}}>{desc}</div>
+      {label && <div style={{color:TEAL,fontSize:"9px",fontWeight:"700",letterSpacing:"1px",marginBottom:"3px"}}>{label}</div>}
+      {title && <div style={{color:TEXT,fontSize:"12px",fontWeight:"700",marginBottom:"4px"}}>{title}</div>}
+      <div style={{color:TEXT2,fontSize:"11px",lineHeight:"1.6"}}>{desc}</div>
     </div>
   );
 }
@@ -941,93 +931,83 @@ function PassiveCard({ label, title, desc, accent }) {
 function AscRow({ asc }) {
   const [lvl, stars, name, desc] = asc;
   return (
-    <div style={{display:"flex",gap:"10px",marginBottom:"8px",background:"#08111c",
-      border:"1px solid #1a2d3e",borderRadius:"5px",padding:"9px 12px"}}>
+    <div style={{display:"flex",gap:"10px",marginBottom:"8px",background:BG4,
+      border:`1px solid ${BORDER}`,borderRadius:"5px",padding:"9px 12px"}}>
       <div style={{minWidth:"28px",flexShrink:0}}>
-        <div style={{color:"#f0c030",fontSize:"11px",fontWeight:"700"}}>{lvl}</div>
-        <div style={{color:"#8aa0b8",fontSize:"9px",letterSpacing:"0.5px"}}>{stars}</div>
+        <div style={{color:TEAL,fontSize:"11px",fontWeight:"700"}}>{lvl}</div>
+        <div style={{color:TEXT2,fontSize:"9px",letterSpacing:"0.5px"}}>{stars}</div>
       </div>
       <div>
-        <div style={{color:"#d4e0ee",fontSize:"12px",fontWeight:"700",marginBottom:"2px"}}>{name}</div>
-        <div style={{color:"#8aa0b8",fontSize:"11px",lineHeight:"1.55"}}>{desc}</div>
+        <div style={{color:TEXT,fontSize:"12px",fontWeight:"700",marginBottom:"2px"}}>{name}</div>
+        <div style={{color:TEXT2,fontSize:"11px",lineHeight:"1.55"}}>{desc}</div>
       </div>
     </div>
   );
 }
 
 function CharacterPage({ char, onBack }) {
-  const rc = ROLE_COLOR[char.role] || "#fff";
+  const rc = ROLE_COLOR[char.role] || TEAL;
   return (
-    <div style={{minHeight:"100vh",background:"#050a12",padding:"20px 24px",fontFamily:"'Exo 2',sans-serif",color:"#d4e0ee"}}>
+    <div style={{minHeight:"100vh",background:BG,padding:"20px 24px",fontFamily:"'Exo 2',sans-serif",color:TEXT}}>
       <div style={{maxWidth:"1100px",margin:"0 auto"}}>
-        <button onClick={onBack} style={{background:"none",border:"1px solid #1c2d40",color:"#8aa0b8",
+        <button onClick={onBack} style={{background:"none",border:`1px solid ${BORDER}`,color:TEXT2,
           padding:"6px 14px",borderRadius:"4px",cursor:"pointer",marginBottom:"20px",
           fontSize:"11px",letterSpacing:"1.5px",textTransform:"uppercase"}}>
           ← Back to Database
         </button>
 
-        {/* Hero */}
-        <div style={{borderBottom:"1px solid #1c2d40",paddingBottom:"18px",marginBottom:"24px"}}>
-          <div style={{fontSize:"11px",color:"#6a8099",textTransform:"uppercase",letterSpacing:"1px",marginBottom:"4px"}}>{char.name}</div>
+        <div style={{borderBottom:`1px solid ${BORDER}`,paddingBottom:"18px",marginBottom:"24px"}}>
+          <div style={{fontSize:"11px",color:MUTED,textTransform:"uppercase",letterSpacing:"1px",marginBottom:"4px"}}>{char.name}</div>
           <div style={{display:"flex",alignItems:"center",gap:"14px",flexWrap:"wrap",marginBottom:"10px"}}>
             <h1 style={{fontFamily:"'Russo One',sans-serif",fontSize:"clamp(20px,3vw,30px)",
-              color:"#f0c030",margin:0,textTransform:"uppercase",letterSpacing:"1px"}}>{char.variant}</h1>
+              color:TEAL,margin:0,textTransform:"uppercase",letterSpacing:"1px"}}>{char.variant}</h1>
             <span style={{background:ROLE_BG[char.role],color:rc,padding:"3px 11px",borderRadius:"4px",
               fontSize:"11px",fontWeight:"700",letterSpacing:"1px",textTransform:"uppercase"}}>{char.role}</span>
           </div>
           <TypePill type={char.type.join(" / ")} />
-          {char.ailment !== "—" && <span style={{color:"#8aa0b8",fontSize:"12px",marginLeft:"10px"}}>Inflicts: {char.ailment}</span>}
+          {char.ailment !== "—" && <span style={{color:TEXT2,fontSize:"12px",marginLeft:"10px"}}>Inflicts: {char.ailment}</span>}
         </div>
 
-        {/* Two-column layout */}
         <div style={{display:"grid",gridTemplateColumns:"minmax(240px,300px) 1fr",gap:"28px"}}>
-
-          {/* LEFT COLUMN */}
           <div>
             <Section title="Build">
               <DataRow label="Uniparts" value={char.uniparts} />
               <DataRow label="Stat Priority" value={char.priority} />
               <DataRow label="Exploit Medal" value={char.medal} />
             </Section>
-
             <Section title="Best Weapons">
               {["Best","2nd","3rd"].map((lbl,i) => char.weapons[i] && char.weapons[i] !== "—" &&
                 <DataRow key={i} label={lbl} value={char.weapons[i]} />)}
             </Section>
-
             <Section title="Skill Upgrade Priority">
               {char.skillPrio.map(([name,n]) => (
                 <div key={name} style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"5px"}}>
-                  <span style={{color:"#c4d4e0",fontSize:"12px"}}>{name}</span>
+                  <span style={{color:TEXT,fontSize:"12px"}}>{name}</span>
                   <Stars n={n} />
                 </div>
               ))}
             </Section>
-
             {char.statusNotes.length > 0 && (
               <Section title="Status / Ailment Reference">
                 {char.statusNotes.map((note,i) => (
-                  <div key={i} style={{color:"#8aa0b8",fontSize:"11px",lineHeight:"1.65",marginBottom:"5px"}}>
-                    <span style={{color:"#f0c03099"}}>◆ </span>{note}
+                  <div key={i} style={{color:TEXT2,fontSize:"11px",lineHeight:"1.65",marginBottom:"5px"}}>
+                    <span style={{color:TEAL+"99"}}>◆ </span>{note}
                   </div>
                 ))}
               </Section>
             )}
           </div>
 
-          {/* RIGHT COLUMN */}
           <div>
             <Section title="Skills">
               {char.skills.map((s,i) => <SkillCard key={i} skill={s} />)}
             </Section>
-
             <Section title="Passive Skill">
               <PassiveCard accent title={char.passive.name} desc={char.passive.desc} />
               {char.addPassives.map(([lbl,desc],i) => (
                 <PassiveCard key={i} label={lbl} title="" desc={desc} />
               ))}
             </Section>
-
             <Section title="Ascension Unlocks">
               {char.ascensions.map((a,i) => <AscRow key={i} asc={a} />)}
             </Section>
@@ -1038,54 +1018,71 @@ function CharacterPage({ char, onBack }) {
   );
 }
 
-function HomePage({ groups, onSelect, search, onSearch }) {
+function FilterBtn({ label, active, onClick, color }) {
   return (
-    <div style={{minHeight:"100vh",background:"#050a12",padding:"24px",fontFamily:"'Exo 2',sans-serif"}}>
+    <button onClick={onClick} style={{
+      background: active ? (color || TEAL)+"22" : "none",
+      border: `1px solid ${active ? (color || TEAL) : BORDER}`,
+      color: active ? (color || TEAL) : MUTED,
+      padding:"5px 14px",borderRadius:"4px",cursor:"pointer",
+      fontSize:"11px",fontWeight:"700",letterSpacing:"1px",
+      textTransform:"uppercase",transition:"all 0.15s ease"
+    }}>{label}</button>
+  );
+}
+
+function HomePage({ groups, onSelect, search, onSearch, roleFilter, onRoleFilter }) {
+  return (
+    <div style={{minHeight:"100vh",background:BG,padding:"24px",fontFamily:"'Exo 2',sans-serif"}}>
       <div style={{maxWidth:"1100px",margin:"0 auto"}}>
 
-        {/* Header */}
-        <div style={{textAlign:"center",marginBottom:"28px",paddingBottom:"24px",borderBottom:"1px solid #1c2d40"}}>
-          <div style={{color:"#f0c03088",fontSize:"9px",letterSpacing:"4px",textTransform:"uppercase",marginBottom:"10px"}}>
+        <div style={{textAlign:"center",marginBottom:"28px",paddingBottom:"24px",borderBottom:`1px solid ${BORDER}`}}>
+          <div style={{color:TEAL+"88",fontSize:"9px",letterSpacing:"4px",textTransform:"uppercase",marginBottom:"10px"}}>
             Defense Force Intelligence Division
           </div>
           <h1 style={{fontFamily:"'Russo One',sans-serif",fontSize:"clamp(22px,4vw,38px)",
-            color:"#d4e0ee",margin:"0 0 6px",textTransform:"uppercase",letterSpacing:"2px",lineHeight:1.1}}>
-            Kaiju No. 8 <span style={{color:"#f0c030"}}>The Game</span>
+            color:TEXT,margin:"0 0 6px",textTransform:"uppercase",letterSpacing:"2px",lineHeight:1.1}}>
+            Kaiju No. 8 <span style={{color:TEAL}}>The Game</span>
           </h1>
-          <div style={{color:"#6a8099",fontSize:"11px",letterSpacing:"3px",textTransform:"uppercase"}}>
+          <div style={{color:MUTED,fontSize:"11px",letterSpacing:"3px",textTransform:"uppercase"}}>
             Character Database
           </div>
-          {/* Legend */}
           <div style={{display:"flex",gap:"16px",justifyContent:"center",marginTop:"16px",flexWrap:"wrap"}}>
-            {Object.entries(ROLE_COLOR).filter(([k]) => k !== "Support").map(([role,c]) => (
+            {Object.entries(ROLE_COLOR).map(([role,c]) => (
               <span key={role} style={{display:"flex",alignItems:"center",gap:"5px"}}>
                 <span style={{width:"8px",height:"8px",borderRadius:"1px",background:c,display:"inline-block"}} />
-                <span style={{color:"#6a8099",fontSize:"11px"}}>{role}</span>
+                <span style={{color:MUTED,fontSize:"11px"}}>{role}</span>
               </span>
             ))}
           </div>
         </div>
 
-        {/* Search */}
-        <div style={{marginBottom:"28px",position:"relative"}}>
+        <div style={{marginBottom:"16px"}}>
           <input value={search} onChange={e => onSearch(e.target.value)}
             placeholder="Search by name, variant, role, or element…"
-            style={{width:"100%",background:"#0d1620",border:"1px solid #1c2d40",color:"#d4e0ee",
+            style={{width:"100%",background:BG3,border:`1px solid ${BORDER}`,color:TEXT,
               padding:"11px 16px",borderRadius:"6px",fontSize:"14px",outline:"none",
               boxSizing:"border-box",fontFamily:"inherit"}} />
         </div>
 
-        {/* Groups */}
+        <div style={{display:"flex",gap:"8px",marginBottom:"28px",flexWrap:"wrap"}}>
+          {ROLES.map(r => (
+            <FilterBtn key={r} label={r} active={roleFilter === r}
+              color={r === "All" ? TEAL : ROLE_COLOR[r]}
+              onClick={() => onRoleFilter(r)} />
+          ))}
+        </div>
+
         {PARENTS.map(parent => {
           const group = groups[parent] || [];
           if (!group.length) return null;
           return (
             <div key={parent} style={{marginBottom:"28px"}}>
               <div style={{fontFamily:"'Russo One',sans-serif",fontSize:"12px",textTransform:"uppercase",
-                letterSpacing:"2px",color:"#8aa0b8",borderBottom:"1px solid #1c2d40",
+                letterSpacing:"2px",color:TEXT2,borderBottom:`1px solid ${BORDER}`,
                 paddingBottom:"7px",marginBottom:"12px",display:"flex",alignItems:"center",gap:"10px"}}>
                 {parent}
-                <span style={{color:"#3a5060",fontSize:"10px",fontFamily:"inherit"}}>({group.length})</span>
+                <span style={{color:BORDER2,fontSize:"10px",fontFamily:"inherit"}}>({group.length})</span>
               </div>
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(250px,1fr))",gap:"9px"}}>
                 {group.map(c => <CharacterCard key={c.id} char={c} onClick={onSelect} />)}
@@ -1095,10 +1092,10 @@ function HomePage({ groups, onSelect, search, onSearch }) {
         })}
 
         {PARENTS.every(p => !(groups[p]||[]).length) && (
-          <div style={{textAlign:"center",color:"#6a8099",padding:"48px 0",fontStyle:"italic"}}>No characters match your search.</div>
+          <div style={{textAlign:"center",color:MUTED,padding:"48px 0",fontStyle:"italic"}}>No characters match your search.</div>
         )}
 
-        <div style={{textAlign:"center",color:"#2a3a48",fontSize:"10px",letterSpacing:"1px",marginTop:"32px",paddingTop:"16px",borderTop:"1px solid #1a2535"}}>
+        <div style={{textAlign:"center",color:BORDER2,fontSize:"10px",letterSpacing:"1px",marginTop:"32px",paddingTop:"16px",borderTop:`1px solid ${BORDER}`}}>
           {CHARACTERS.length} characters · Kaiju No. 8 The Game Guide
         </div>
       </div>
@@ -1109,6 +1106,7 @@ function HomePage({ groups, onSelect, search, onSearch }) {
 export default function App() {
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("All");
 
   useEffect(() => {
     const el = document.createElement("link");
@@ -1120,18 +1118,22 @@ export default function App() {
 
   const groups = useMemo(() => {
     const q = search.toLowerCase().trim();
-    const filtered = q ? CHARACTERS.filter(c =>
-      c.name.toLowerCase().includes(q) ||
-      c.variant.toLowerCase().includes(q) ||
-      c.role.toLowerCase().includes(q) ||
-      c.type.some(t => t.toLowerCase().includes(q)) ||
-      (c.ailment !== "—" && c.ailment.toLowerCase().includes(q))
-    ) : CHARACTERS;
+    const filtered = CHARACTERS.filter(c => {
+      const matchSearch = !q ||
+        c.name.toLowerCase().includes(q) ||
+        c.variant.toLowerCase().includes(q) ||
+        c.role.toLowerCase().includes(q) ||
+        c.type.some(t => t.toLowerCase().includes(q)) ||
+        (c.ailment !== "—" && c.ailment.toLowerCase().includes(q));
+      const matchRole = roleFilter === "All" || c.role === roleFilter;
+      return matchSearch && matchRole;
+    });
     const g = {};
     PARENTS.forEach(p => { g[p] = filtered.filter(c => c.parent === p); });
     return g;
-  }, [search]);
+  }, [search, roleFilter]);
 
   if (selected) return <CharacterPage char={selected} onBack={() => setSelected(null)} />;
-  return <HomePage groups={groups} onSelect={setSelected} search={search} onSearch={setSearch} />;
+  return <HomePage groups={groups} onSelect={setSelected} search={search} onSearch={setSearch}
+    roleFilter={roleFilter} onRoleFilter={setRoleFilter} />;
 }
